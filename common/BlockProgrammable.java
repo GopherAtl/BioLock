@@ -149,7 +149,7 @@ public abstract class BlockProgrammable extends BlockContainer {
             int westBlock = world.getBlockId(x - 1, y, z);
             int eastBlock = world.getBlockId(x + 1, y, z);
             byte dir = 3;
-
+            
             if (Block.opaqueCubeLookup[northBlock] && !Block.opaqueCubeLookup[southBlock])            
                 dir = 2;
             else if (Block.opaqueCubeLookup[southBlock] && !Block.opaqueCubeLookup[northBlock])            
@@ -168,7 +168,10 @@ public abstract class BlockProgrammable extends BlockContainer {
     public void onBlockPlacedBy(World world, int x, int y, int z, EntityLiving entity, ItemStack par6ItemStack)
     {
         int facing = MathHelper.floor_double((double)(entity.rotationYaw / 90.0f) + 0.5D) & 3;
+        float angle=facing*-90f;
         world.setBlockMetadataWithNotify(x,y,z,facingToSideMap[facing],7);
+        TileEntityProgrammable tep=(TileEntityProgrammable)world.getBlockTileEntity(x, y, z);
+        tep.orientAngle=angle;
     }
     
     

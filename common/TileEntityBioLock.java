@@ -200,6 +200,7 @@ public class TileEntityBioLock extends TileEntityProgrammable {
     //array of redstone programs, indexed by relative side
     RedstoneProgram[] redstonePrograms;
     
+    
     public static String getBaseInstanceFileName()
     {
     	return "biolock";

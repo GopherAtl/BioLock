@@ -39,7 +39,7 @@ public class BlockBioLock extends BlockProgrammable {
 		textureBottom=iconRegister.registerIcon("BioLock:biolock_bottom");
 		textureSide=iconRegister.registerIcon("BioLock:biolock_side");
 		
-		texturesFront=new Icon[16];
+		texturesFront=new Icon[13];
 		for (int i=0; i<13; ++i)
 			texturesFront[i]=iconRegister.registerIcon("BioLock:biolock_front"+i);		
 		

@@ -41,6 +41,7 @@ public class BioLock
 	
 	public static Block bioLock;
 	public static Block prb;
+	public static Block keypadLock;
 	
 	private static HashMap<String,InstanceDataManager> instanceManagers=new HashMap<String,InstanceDataManager>();	
 	
@@ -65,6 +66,7 @@ public class BioLock
 	{
 		public static int bioLockBlockID;
 		public static int prbBlockID;
+		public static int keypadLockBlockID;
 		public static boolean enableKnowsNames;
 		public static int internalMemorySize;
 	}
@@ -78,9 +80,11 @@ public class BioLock
 	{
 		//System.out.println("[BioLock] [DEBUG] Resetting instance managers..");
 		instanceManagers.put(TileEntityBioLock.class.getSimpleName(), new InstanceDataManager("BioLocks",TileEntityBioLock.getBaseInstanceFileName()));
+		instanceManagers.put(TileEntityPRB.class.getSimpleName(), new InstanceDataManager("BioLocks",TileEntityPRB.getBaseInstanceFileName()));
+		instanceManagers.put(TileEntityKeypadLock.class.getSimpleName(), new InstanceDataManager("BioLocks",TileEntityKeypadLock.getBaseInstanceFileName()));
+
 		TileEntityBioLock.loadClassDataForWorld();
 
-		instanceManagers.put(TileEntityPRB.class.getSimpleName(), new InstanceDataManager("BioLocks",TileEntityPRB.getBaseInstanceFileName()));
 	}
 	
 	@Mod.PreInit
@@ -95,6 +99,10 @@ public class BioLock
 		prop = configFile.getBlock("PRB_BlockID", 736);
 		prop.comment = "Block ID for the Programmable Redstone Block peripheral";
 		Config.prbBlockID = prop.getInt();
+
+		prop = configFile.getBlock("Keypad_BlockID",737);
+		prop.comment = "Block ID for the Keypad lock peripheral";
+		Config.keypadLockBlockID = prop.getInt();
 		
 		prop = configFile.get("general", "bioLock_GivesUsernames", false);
 		prop.comment = "If true, BioLock's events give a username instead of a unique random string.";
@@ -127,6 +135,15 @@ public class BioLock
 		GameRegistry.addRecipe(new RecipeResetProgrammable(prb));
 		
 		LanguageRegistry.addName(prb,"PRB");
+		
+		keypadLock=new BlockKeypadLock(Config.keypadLockBlockID).setUnlocalizedName("KeypadLockBlock");
+		
+		GameRegistry.registerBlock(keypadLock,ItemBlockProgrammable.class,"blockKeypadLockBlock");
+		GameRegistry.registerTileEntity(TileEntityKeypadLock.class,"KeypadLockPeripheral");
+		GameRegistry.addRecipe(new ItemStack(keypadLock), new Object[] { "BBB", "BBB", "BBB", 'B', Block.stoneButton});
+		GameRegistry.addRecipe(new RecipeResetProgrammable(keypadLock));
+		
+		LanguageRegistry.addName(keypadLock,"Keypad Lock");
 		
 		proxy.registerRenderInformation();		
 	}	

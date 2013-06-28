@@ -192,7 +192,8 @@ public abstract class TileEntityProgrammable extends TileEntity implements IPeri
 	private String accessPassword;	
 	private HashMap<Integer,Integer> computerLevels;
 	private String label;
-
+	public float orientAngle;
+	
 	//these are generated, and stored simply for efficiency 
 	private ArrayList<PeripheralMethod> methods;
 	private String[] methodNames;
@@ -306,7 +307,12 @@ public abstract class TileEntityProgrammable extends TileEntity implements IPeri
     	return result;
     	
     }
-	
+
+	public int getFacing() 
+	{		
+		return worldObj.getBlockMetadata(xCoord, yCoord, zCoord);
+	}
+		
 	public int getInstanceID()
 	{
 		return instanceID;

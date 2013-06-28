@@ -37,9 +37,10 @@ public class ItemBlockProgrammable extends ItemBlock {
         		else
         		{
         			InstanceDataManager instanceManager=BioLock.getInstanceManager(te.getClass());
-        			if (instanceManager!=null)
+        			if (instanceManager==null)
         				System.out.println("[BioLock] [PRB] instanceManager is null!");
-                	tep.setInstanceID(instanceManager.getNextID());
+        			else
+        				tep.setInstanceID(instanceManager.getNextID());
         		}
         	}
         }
@@ -56,12 +57,5 @@ public class ItemBlockProgrammable extends ItemBlock {
 		}
     }
 
-    @SideOnly(Side.SERVER)
-    @Override
-    public void onPlayerStoppedUsing(ItemStack par1ItemStack, World par2World, EntityPlayer par3EntityPlayer, int par4) 
-    {
-    	par3EntityPlayer.sendChatToPlayer("You banged the ... uhm, whichever kind of programmable block this is... "+par4+" times.");
-    	System.out.println("[BioLock] BANG BANG BANG");
-    }
 
 }

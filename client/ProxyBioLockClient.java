@@ -1,10 +1,12 @@
 package gopheratl.biolock.client;
 
+import cpw.mods.fml.client.registry.ClientRegistry;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraftforge.client.IItemRenderer;
 import net.minecraftforge.client.MinecraftForgeClient;
 import gopheratl.biolock.common.BioLock;
 import gopheratl.biolock.common.ProxyBioLock;
+import gopheratl.biolock.common.TileEntityKeypadLock;
 
 public class ProxyBioLockClient extends ProxyBioLock 
 {
@@ -22,12 +24,12 @@ public class ProxyBioLockClient extends ProxyBioLock
 				break;
 			}			
 		}
-		
-		//IItemRenderer bioLockRenderer;
-		//MinecraftForgeClient.registerItemRenderer( BioLock.Config.bioLockBlockID,bioLockRenderer);
-				
+						
 		BioLock.bioLock.setCreativeTab(computerTab);		
 		BioLock.prb.setCreativeTab(computerTab);		
+		BioLock.keypadLock.setCreativeTab(computerTab);
+		
+		ClientRegistry.bindTileEntitySpecialRenderer( TileEntityKeypadLock.class, new TileEntityRendererKeypad());
     }
 	
 }
