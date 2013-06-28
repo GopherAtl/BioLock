@@ -33,37 +33,37 @@ public class TileEntityRendererKeypad extends TileEntitySpecialRenderer {
 		
 		public void renderGeometry(Tessellator tessellator, float depth)
 		{
-			float tx=3*texPixel,ty=3*texPixel;
+			float tx=texPixel*2,ty=texPixel*2;
 			
 			tessellator.setNormal(0f,0f,-1f);
 			tessellator.addVertexWithUV(x,   y,   z+depth, tx, ty);
-			tessellator.addVertexWithUV(x,   y+h, z+depth, tx, ty);
-			tessellator.addVertexWithUV(x+w, y+h, z+depth, tx, ty);
-			tessellator.addVertexWithUV(x+w, y,   z+depth, tx, ty);
+			tessellator.addVertexWithUV(x,   y+h, z+depth, tx, ty+2f*texPixel);
+			tessellator.addVertexWithUV(x+w, y+h, z+depth, tx+2f*texPixel, ty+2f*texPixel);
+			tessellator.addVertexWithUV(x+w, y,   z+depth, tx+2f*texPixel, ty);
 			
 			tessellator.setNormal(-1f,0f,0f);
 			
 			tessellator.addVertexWithUV(x,   y,   z+depth, tx, ty);
-			tessellator.addVertexWithUV(x,   y,   z+2*texPixel+depth, tx, ty);
-			tessellator.addVertexWithUV(x,   y+h, z+2*texPixel+depth, tx, ty);
-			tessellator.addVertexWithUV(x,   y+h, z+depth, tx, ty);
+			tessellator.addVertexWithUV(x,   y,   z+2*texPixel+depth, tx+2f*texPixel, ty);
+			tessellator.addVertexWithUV(x,   y+h, z+2*texPixel+depth, tx+2f*texPixel, ty+2f*texPixel);
+			tessellator.addVertexWithUV(x,   y+h, z+depth, tx, ty+2f*texPixel);
 			
 			tessellator.setNormal(1f,0f,0f);
-			tessellator.addVertexWithUV(x+w,   y,   z+2*texPixel+depth, tx, ty);
+			tessellator.addVertexWithUV(x+w,   y,   z+2*texPixel+depth, tx+2f*texPixel, ty);
 			tessellator.addVertexWithUV(x+w,   y,   z+depth, tx, ty);
-			tessellator.addVertexWithUV(x+w,   y+h, z+depth, tx, ty);
-			tessellator.addVertexWithUV(x+w,   y+h, z+2*texPixel+depth, tx, ty);
+			tessellator.addVertexWithUV(x+w,   y+h, z+depth, tx, ty+2f*texPixel);
+			tessellator.addVertexWithUV(x+w,   y+h, z+2*texPixel+depth, tx+2f*texPixel, ty+2f*texPixel);
 			
 			tessellator.setNormal(0f,-1f,0f);
 			tessellator.addVertexWithUV(x,     y,   z+depth, tx, ty);
-			tessellator.addVertexWithUV(x+w,   y,   z+depth, tx, ty);
-			tessellator.addVertexWithUV(x+w,   y,   z+2*texPixel+depth, tx, ty);
-			tessellator.addVertexWithUV(x,     y,   z+2*texPixel+depth, tx, ty);
+			tessellator.addVertexWithUV(x+w,   y,   z+depth, tx+2f*texPixel, ty);
+			tessellator.addVertexWithUV(x+w,   y,   z+2*texPixel+depth, tx+2f*texPixel, ty+2f*texPixel);
+			tessellator.addVertexWithUV(x,     y,   z+2*texPixel+depth, tx, ty+2f*texPixel);
 
 			tessellator.setNormal(0f,1f,0f);
-			tessellator.addVertexWithUV(x,     y+h,   z+2*texPixel+depth, tx, ty);
-			tessellator.addVertexWithUV(x+w,   y+h,   z+2*texPixel+depth, tx, ty);
-			tessellator.addVertexWithUV(x+w,   y+h,   z+depth, tx, ty);
+			tessellator.addVertexWithUV(x,     y+h,   z+2*texPixel+depth, tx+2f*texPixel, ty);
+			tessellator.addVertexWithUV(x+w,   y+h,   z+2*texPixel+depth, tx+2f*texPixel, ty+2f*texPixel);
+			tessellator.addVertexWithUV(x+w,   y+h,   z+depth, tx, ty+2f*texPixel);
 			tessellator.addVertexWithUV(x,     y+h,   z+depth, tx, ty);
 		}
 		
@@ -73,7 +73,7 @@ public class TileEntityRendererKeypad extends TileEntitySpecialRenderer {
 			
 			GL11.glPushMatrix();
 			
-			GL11.glTranslatef(x+w/2f, y+h/2f, texPixel*-.07f);
+			GL11.glTranslatef(x+w/2f, y+h/2f, depth+texPixel*-.07f);
 			float scale=h/10;
 			GL11.glScalef(-scale,-scale,scale);
 			GL11.glTranslatef(.5f,.5f,0f);
@@ -130,25 +130,76 @@ public class TileEntityRendererKeypad extends TileEntitySpecialRenderer {
 		GL11.glPushMatrix();
 		GL11.glTranslatef((float)x, (float)y,(float)z);
 		GL11.glTranslatef(.5f,0,.5f);
-		GL11.glRotatef(te.orientAngle,0f,1f,0f);
+		GL11.glRotatef(te.getAngle(),0f,1f,0f);
 		GL11.glTranslatef(-.5f,0,-.5f);
 
-		this.bindTextureByName("/mods/BioLock/textures/blocks/biolock_front11.png");
+		this.bindTextureByName("/mods/BioLock/textures/blocks/biolock_side.png");
 		
 		tessellator.startDrawingQuads();
 		tessellator.setNormal(0f, 0f, 1f);
-		tessellator.addVertexWithUV( 0f, 0f, texPixel, 0f, 0f);
-		tessellator.addVertexWithUV( 0f, 1f, texPixel, 0f, 1f);
-		tessellator.addVertexWithUV( 1f, 1f, texPixel, 1f, 1f);
-		tessellator.addVertexWithUV( 1f, 0f, texPixel, 1f, 0f);
+		//inset face
+		tessellator.addVertexWithUV( texPixel,    texPixel,    texPixel, texPixel,    1f-texPixel);
+		tessellator.addVertexWithUV( texPixel,    1f-texPixel, texPixel, texPixel,    texPixel);
+		tessellator.addVertexWithUV( 1f-texPixel, 1f-texPixel, texPixel, 1f-texPixel, texPixel);
+		tessellator.addVertexWithUV( 1f-texPixel, texPixel,    texPixel, 1f-texPixel, 1f-texPixel);
+
+		
+		//bottom lip front
+		tessellator.addVertexWithUV( 0f,          0f,          0.001f,  0f,          0f);
+		tessellator.addVertexWithUV( texPixel,    texPixel,    0.001f,  texPixel,    texPixel);
+		tessellator.addVertexWithUV( 1f-texPixel, texPixel,    0.001f,  1f-texPixel, texPixel);
+		tessellator.addVertexWithUV( 1f,          0f,          0.001f,  1f,          0f);
+		//top lip front
+		tessellator.addVertexWithUV( texPixel,    1f-texPixel, 0.001f,  texPixel,    1f-texPixel);
+		tessellator.addVertexWithUV( 0f,          1f,          0.001f,  0f,          1f);
+		tessellator.addVertexWithUV( 1f,          1f,          0.001f,  1f,          1f);
+		tessellator.addVertexWithUV( 1f-texPixel, 1f-texPixel, 0.001f,   1f-texPixel, 1f-texPixel);
+		//right lip front
+		tessellator.addVertexWithUV( 0f,          0f,          0.001f,  0f,          0f);
+		tessellator.addVertexWithUV( 0f,          1f,          0.001f,  0f,          1f);
+		tessellator.addVertexWithUV( texPixel,    1f-texPixel, 0.001f,  texPixel,    1f-texPixel);
+		tessellator.addVertexWithUV( texPixel,    texPixel,    0.001f,  texPixel,    texPixel);
+		//left lip front
+		tessellator.addVertexWithUV( 1f-texPixel, texPixel,    0.001f,  1f-texPixel, texPixel);
+		tessellator.addVertexWithUV( 1f-texPixel, 1f-texPixel, 0.001f,  1f-texPixel, 1f-texPixel);
+		tessellator.addVertexWithUV( 1f,          1f,          0.001f,  1f,          1f);
+		tessellator.addVertexWithUV( 1f,          0f,          0.001f,  1f,          0f);
+
+		//bottom lip inside
+		tessellator.setNormal(0f,1f,0f);
+		tessellator.addVertexWithUV( texPixel,    texPixel,    0f,       texPixel,    1f);
+		tessellator.addVertexWithUV( texPixel,    texPixel,    texPixel, texPixel,    1f-texPixel);
+		tessellator.addVertexWithUV( 1f-texPixel, texPixel,    texPixel, 1f-texPixel, 1f-texPixel);
+		tessellator.addVertexWithUV( 1f-texPixel, texPixel,    0f,       1f-texPixel, 1f);
+		//top lip inside
+		tessellator.setNormal(0f,-1f,0f);
+		tessellator.addVertexWithUV( texPixel,    1f-texPixel, texPixel, texPixel,    texPixel);
+		tessellator.addVertexWithUV( texPixel,    1f-texPixel, 0f,       texPixel,    0f);
+		tessellator.addVertexWithUV( 1f-texPixel, 1f-texPixel, 0f,       1f-texPixel, 0f);
+		tessellator.addVertexWithUV( 1f-texPixel, 1f-texPixel, texPixel, 1f-texPixel, texPixel);
+		//right lip inside
+		tessellator.setNormal(1f,0f,0f);
+		tessellator.addVertexWithUV( texPixel,    texPixel,    0f,       1f-texPixel, texPixel);
+		tessellator.addVertexWithUV( texPixel,    1f-texPixel, 0f,       1f-texPixel, 1f-texPixel);
+		tessellator.addVertexWithUV( texPixel,    1f-texPixel, texPixel, 1f,          1f-texPixel);
+		tessellator.addVertexWithUV( texPixel,    texPixel,    texPixel, 1f,          texPixel);
+		//left lip inside
+		tessellator.setNormal(-1f,1f,0f);
+		tessellator.addVertexWithUV( 1f-texPixel, texPixel,    texPixel, 1f,          texPixel);
+		tessellator.addVertexWithUV( 1f-texPixel, 1f-texPixel, texPixel, 1f,          1f-texPixel);
+		tessellator.addVertexWithUV( 1f-texPixel, 1f-texPixel, 0f,       1f-texPixel, 1f-texPixel);
+		tessellator.addVertexWithUV( 1f-texPixel, texPixel,    0f,       1f-texPixel, texPixel);
+		
+		long time=world.getTotalWorldTime();
+		
 		for (int i=0; i<12; ++i)
-			buttons[i].renderGeometry(tessellator,0);
+			buttons[i].renderGeometry(tessellator,te.buttonStates[i].isPressed(time)?texPixel*.75f:0f);
 		
 		tessellator.draw();		
 		
 		FontRenderer font=getFontRenderer();
 		for (int i=0; i<12; ++i)
-			buttons[i].writeLabel(font,0);
+			buttons[i].writeLabel(font,te.buttonStates[i].isPressed(time)?texPixel*.75f:0f);
 				
 		
 		GL11.glPopMatrix();

@@ -53,6 +53,8 @@ public abstract class TileEntityProgrammable extends TileEntity implements IPeri
 		sideMap.put("left",5);
 	}
 	
+	public static float[] facingToAngle={0,0,0,180,90,270};
+	
 	public static String[] sideNames={"bottom","top","front","back","right","left"};
 
 	
@@ -191,8 +193,7 @@ public abstract class TileEntityProgrammable extends TileEntity implements IPeri
 	private boolean isLocked;
 	private String accessPassword;	
 	private HashMap<Integer,Integer> computerLevels;
-	private String label;
-	public float orientAngle;
+	private String label;	
 	
 	//these are generated, and stored simply for efficiency 
 	private ArrayList<PeripheralMethod> methods;
@@ -312,7 +313,12 @@ public abstract class TileEntityProgrammable extends TileEntity implements IPeri
 	{		
 		return worldObj.getBlockMetadata(xCoord, yCoord, zCoord);
 	}
-		
+	
+	public float getAngle() 
+	{
+		return facingToAngle[getFacing()];
+	}
+	
 	public int getInstanceID()
 	{
 		return instanceID;

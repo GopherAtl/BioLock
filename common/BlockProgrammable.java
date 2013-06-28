@@ -170,8 +170,6 @@ public abstract class BlockProgrammable extends BlockContainer {
         int facing = MathHelper.floor_double((double)(entity.rotationYaw / 90.0f) + 0.5D) & 3;
         float angle=facing*-90f;
         world.setBlockMetadataWithNotify(x,y,z,facingToSideMap[facing],7);
-        TileEntityProgrammable tep=(TileEntityProgrammable)world.getBlockTileEntity(x, y, z);
-        tep.orientAngle=angle;
     }
     
     

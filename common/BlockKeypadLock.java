@@ -46,9 +46,7 @@ public class BlockKeypadLock extends BlockProgrammable {
 	
 	@Override
 	public boolean shouldSideBeRendered(IBlockAccess blockAccess, int x, int y, int z, int side)
-	{
-		return false;
-		/*
+	{		
 		if (side>1)
 		{
 			int mx=x, my=y, mz=z;
@@ -75,4 +73,51 @@ public class BlockKeypadLock extends BlockProgrammable {
 		return false;
 	}
 	
+	@Override
+	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ)
+	{
+		System.out.println("[BioLock] [DEBUG] Activate with hit at "+hitX+","+hitY+","+hitZ);
+		
+		//if it wasn't the face, false
+		int facing=world.getBlockMetadata(x, y, z);
+		if (facing!=side)
+		{
+			System.out.println("[BioLock] [DEBUG] wrong side.");
+			return false;
+		}
+		System.out.println("[BioLock] [DEBUG] side="+side);
+		float relX=0f,relY=hitY*16f;
+		//normalize face-relative "x" pixel position
+		switch(facing)
+		{
+		case 2: relX=hitX*16f; break;
+		case 3: relX=(1f-hitX)*16f; break;
+		case 4: relX=(1f-hitZ)*16f; break;
+		case 5: relX=hitZ*16f; break;		
+		}
+		
+		//figure out what, if any, button was hit?
+		if (relX<4f || relX>12 || relY<2.5f || relY>13.5f)
+		{
+			System.out.println("[BioLock] [DEBUG] outside button area.");			
+			//completely outside area of buttons, return
+			return false;
+		}
+		int col=(int)((relX-4f)/3f);
+		float colOff=(relX-4f)%3f;
+		int row=(int)((relY-2.5f)/3f);
+		float rowOff=(relY-2.5f)%3f;
+		//check and return if between buttons
+		if (colOff>2f || rowOff>2f)
+		{
+			System.out.println("[BioLock] [DEBUG] between buttons.");
+			return false;
+		}		
+		
+		//ok! hit a button!
+		System.out.println("[BioLock] [DEBUG] Hit button on row "+row+" in col "+col);
+		TileEntityKeypadLock te=(TileEntityKeypadLock)world.getBlockTileEntity(x,y,z);
+		te.buttonStates[(2-col)+3*(3-row)].press(world.getTotalWorldTime());
+		return false;
+	}
 }
