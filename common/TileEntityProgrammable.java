@@ -185,7 +185,7 @@ public abstract class TileEntityProgrammable extends TileEntity implements IPeri
 		{
 			String basePath=GopherCore.getSaveSubDirPath("biolocks"+File.separator+"lua"+File.separator);
 			System.out.println(mountDir+" from "+basePath+name+".lua");
-			computer.mountFixedDir(mountDir+name,"mods/BioLock/lua/"+name+".lua", true, 0);			
+			//computer.mountFixedDir(mountDir+name,"mods/BioLock/lua/"+name+".lua", true, 0);			
 		}
 	}
 	
