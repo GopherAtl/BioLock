@@ -31,7 +31,6 @@ public class BlockKeypadLock extends BlockProgrammable {
     @SideOnly(Side.CLIENT)
     public Icon getBlockTexture(IBlockAccess blockAccess, int x, int y, int z, int side)
     {
-		System.out.println("[BioLock] [DEBUG] pos="+x+","+y+","+z);
         return tempIcon;
     }
 
@@ -77,6 +76,8 @@ public class BlockKeypadLock extends BlockProgrammable {
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ)
 	{
 		System.out.println("[BioLock] [DEBUG] Activate with hit at "+hitX+","+hitY+","+hitZ);
+		if (player.isSneaking())
+			return false;
 		
 		//if it wasn't the face, false
 		int facing=world.getBlockMetadata(x, y, z);
@@ -117,7 +118,8 @@ public class BlockKeypadLock extends BlockProgrammable {
 		//ok! hit a button!
 		System.out.println("[BioLock] [DEBUG] Hit button on row "+row+" in col "+col);
 		TileEntityKeypadLock te=(TileEntityKeypadLock)world.getBlockTileEntity(x,y,z);
-		te.buttonStates[(2-col)+3*(3-row)].press(world.getTotalWorldTime());
-		return false;
+		te.pressedButton(player,(2-col)+3*(3-row));
+		return true;
+	
 	}
 }

@@ -4,6 +4,7 @@ import gopheratl.GopherCore.GopherCore;
 import gopheratl.GopherCore.InstanceDataManager;
 import gopheratl.biolock.common.TileEntityProgrammable.FileMount;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.DataOutputStream;
@@ -30,15 +31,18 @@ import com.google.common.primitives.Bytes;
 
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagInt;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
+import net.minecraft.network.packet.Packet250CustomPayload;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.tileentity.TileEntity;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.IScheduledTickHandler;
+import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
 import dan200.computer.api.IComputerAccess;
@@ -672,9 +676,6 @@ public class TileEntityBioLock extends TileEntityProgrammable {
 
 	
 	
-    
-
-	
 	//called from block in isProvidingStrongPower to decide 
 	@Override
 	public boolean isPowering(int side)
@@ -716,14 +717,33 @@ public class TileEntityBioLock extends TileEntityProgrammable {
 						outputChanged=true;
 					}
 				}
+
+				Packet250CustomPayload packet=new Packet250CustomPayload();
+				ByteArrayOutputStream outBytes=new ByteArrayOutputStream(17);
+				DataOutputStream dataOut=new DataOutputStream(outBytes);
+
+				dataOut.writeShort(2);
+				dataOut.writeShort(instanceID);
+				dataOut.writeInt(xCoord);
+				dataOut.writeInt(yCoord);
+				dataOut.writeInt(zCoord);
+				packet.data=outBytes.toByteArray();
+				packet.length=outBytes.size();
+				packet.channel="biolock";
+				
+				EntityPlayerMP p=(EntityPlayerMP)player;			
+				PacketDispatcher.sendPacketToAllAround((double)xCoord, (double)yCoord, (double)zCoord, 64, p.dimension, packet);
+				
 			} catch (IOException e) {
-				// TODO log it				
+				e.printStackTrace();
 			}
  		}
-		else
-		{
-	        animating=true;
-		}
+	}
+
+	public void doAnimate() 
+	{
+		animating=true;
+		faceFrameIndex=0;
 	}
 
 }

@@ -34,7 +34,7 @@ import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
 
 @Mod(modid="BioLock", name="BioLock", version="2.0b")
-@NetworkMod(clientSideRequired=true, serverSideRequired=true)
+@NetworkMod(clientSideRequired=true, serverSideRequired=true, channels={"biolock"}, packetHandler=BiolockPacketHandler.class)
 public class BioLock
 {
 	public int[] foo={1,2,3};

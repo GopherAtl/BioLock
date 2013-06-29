@@ -2,6 +2,7 @@ package gopheratl.biolock.common;
 
 import gopheratl.GopherCore.GopherCore;
 import gopheratl.GopherCore.InstanceDataManager;
+import gopheratl.biolock.common.BiolockPacketHandler.BioPacket;
 import gopheratl.biolock.common.TileEntityBioLock.RedstoneProgram;
 import gopheratl.biolock.common.TileEntityBioLock.StoredPrint;
 
@@ -21,10 +22,12 @@ import java.util.Iterator;
 import java.util.Map;
 
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.network.Player;
 import cpw.mods.fml.relauncher.Side;
 import dan200.computer.api.IComputerAccess;
 import dan200.computer.api.IPeripheral;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagInt;
 import net.minecraft.nbt.NBTTagList;
@@ -32,8 +35,14 @@ import net.minecraft.nbt.NBTTagString;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
+import net.minecraftforge.common.DimensionManager;
 
 public abstract class TileEntityProgrammable extends TileEntity implements IPeripheral {
+
+	//base for channel handlers that are associated with specific TileEntity instances
+		
+	
 	//**********************
 	//  static member data
 
@@ -448,20 +457,31 @@ public abstract class TileEntityProgrammable extends TileEntity implements IPeri
 		}
 	}
 	
+	/**
+	 * called by mc, writes persistent data to the provided NBT, also calls saveInstanceData, which saves server-only data that
+	 * is connected to the instanceID, not the actual block
+	 */
 	@Override 
 	public void writeToNBT(NBTTagCompound nbt)
 	{
 		super.writeToNBT(nbt);
 		nbt.setInteger("instanceID",instanceID);
-		saveInstanceData();
+ 		if (FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER)
+ 			saveInstanceData();
 	}
 	
+	/**
+	 * called by mc, reads persistent data from the provided NBT, also calls loadInstanceData, which reads back server-only data that
+	 * is connected to the instanceID, not the actual block
+	 */
 	@Override 
 	public void readFromNBT(NBTTagCompound nbt)
 	{
 		super.readFromNBT(nbt);
  		setInstanceID(nbt.getInteger("instanceID"));
- 		loadInstanceData();
+ 		if (FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER)
+ 			loadInstanceData();
+ 		
 	}
 
 	/**
@@ -496,7 +516,7 @@ public abstract class TileEntityProgrammable extends TileEntity implements IPeri
 	@Override
 	public boolean canAttachToSide(int side) 
 	{
-		return true;
+		return side!=getFacing();
 	}
 
 	@Override
