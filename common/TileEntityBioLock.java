@@ -176,8 +176,9 @@ public class TileEntityBioLock extends TileEntityProgrammable {
 		}
 	}
 
-	private static FileMount[] fileMounts;
+	private static FileMount[] fileMounts = new FileMount[] {new FileMount("biolock","rom/programs/")};
 	
+	@Override
 	protected FileMount[] getFileMounts()
 	{
 		return fileMounts;
@@ -242,8 +243,7 @@ public class TileEntityBioLock extends TileEntityProgrammable {
 	
 	
 	static void loadClassDataForWorld()
-	{
-
+	{		
 		//load hashes!
 		ObjectInputStream input;
 		
@@ -283,8 +283,6 @@ public class TileEntityBioLock extends TileEntityProgrammable {
 				printSet=new HashSet();
 			}
 		}
-		 
-		fileMounts = new FileMount[] {new FileMount("biolock","rom/programs/")};
 			
 		
 	}

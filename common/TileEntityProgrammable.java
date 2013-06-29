@@ -183,8 +183,9 @@ public abstract class TileEntityProgrammable extends TileEntity implements IPeri
 		
 		public void mount(IComputerAccess computer)
 		{
-			String basePath=MinecraftServer.getServer().getFolderName()+"/BioLocks/lua/";
-			computer.mountFixedDir(mountDir+name, basePath+name+".lua", true, 0);			
+			String basePath=GopherCore.getSaveSubDirPath("biolocks"+File.separator+"lua"+File.separator);
+			System.out.println(mountDir+" from "+basePath+name+".lua");
+			computer.mountFixedDir(mountDir+name,"mods/BioLock/lua/"+name+".lua", true, 0);			
 		}
 	}
 	
@@ -536,9 +537,15 @@ public abstract class TileEntityProgrammable extends TileEntity implements IPeri
 		computerPeripheralCounts.put(key, count+1);
 		
 		FileMount[] fileMounts=getFileMounts();
-		if (fileMounts!=null && count>0)
-			for (int i=1;i<fileMounts.length;++i)
+		System.out.println("[BioLock] [DEBUG] Mounting files to "+computer.getID()+", assuming "+fileMounts+"!=null and "+count+"==0");
+		if (fileMounts!=null && count==0)
+		{
+			for (int i=0;i<fileMounts.length;++i)
+			{
+				System.out.println("Mounting "+fileMounts[i].name+" to "+fileMounts[i].mountDir);
 				fileMounts[i].mount(computer);
+			}
+		}
 	}
 
 	@Override
