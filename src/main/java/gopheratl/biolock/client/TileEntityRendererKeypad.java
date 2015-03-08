@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 public class TileEntityRendererKeypad extends TileEntitySpecialRenderer {
@@ -121,7 +122,7 @@ public class TileEntityRendererKeypad extends TileEntitySpecialRenderer {
 		World world=te.getWorldObj();
 		
 		
-		float brightness=BioLock.keypadLock.getLightValue(world, bx, by, bz);
+		float brightness=BioLock.Blocks.keypadLock.getLightValue(world, bx, by, bz);
 		int light=world.getLightBrightnessForSkyBlocks(bx,by,bz,0);				
 		
 		tessellator.setColorOpaque_F(brightness,brightness,brightness);		
@@ -132,8 +133,9 @@ public class TileEntityRendererKeypad extends TileEntitySpecialRenderer {
 		GL11.glTranslatef(.5f,0,.5f);
 		GL11.glRotatef(te.getAngle(),0f,1f,0f);
 		GL11.glTranslatef(-.5f,0,-.5f);
+		
 
-		this.bindTexture("BioLock:biolock_side");
+		this.bindTexture(new ResourceLocation("BioLock:biolock_side"));
 		
 		tessellator.startDrawingQuads();
 		tessellator.setNormal(0f, 0f, 1f);
@@ -197,7 +199,7 @@ public class TileEntityRendererKeypad extends TileEntitySpecialRenderer {
 		
 		tessellator.draw();		
 		
-		FontRenderer font=getFontRenderer();
+		FontRenderer font=this.func_147498_b();
 		for (int i=0; i<12; ++i)
 			buttons[i].writeLabel(font,te.buttonStates[i].isPressed(time)?texPixel*.75f:0f);
 				

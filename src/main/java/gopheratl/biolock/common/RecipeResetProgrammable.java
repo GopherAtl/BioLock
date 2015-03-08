@@ -8,12 +8,10 @@ import net.minecraft.world.World;
 
 public class RecipeResetProgrammable implements IRecipe {
 
-	Block block;
 	ItemStack output;
 	
 	public RecipeResetProgrammable(Block block)
 	{
-		this.block=block;
 		output=new ItemStack(block);
 	}
 	
@@ -23,7 +21,7 @@ public class RecipeResetProgrammable implements IRecipe {
 		for(int i=0;i<inventorycrafting.getSizeInventory();++i)
 		{
 			ItemStack stack=inventorycrafting.getStackInSlot(i);
-			if (stack!=null && stack.getItem()==block)
+			if (stack!=null && stack.getItem()==output.getItem())
 			{
 				if (found)
 					return false;

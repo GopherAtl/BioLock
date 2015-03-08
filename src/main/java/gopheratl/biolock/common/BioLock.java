@@ -2,11 +2,13 @@ package gopheratl.biolock.common;
 
 import gopheratl.GopherCore.GopherCore;
 import gopheratl.GopherCore.InstanceDataManager;
+import gopheratl.biolock.common.util.BLLog;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Set;
+
 
 
 
@@ -33,7 +35,7 @@ import cpw.mods.fml.relauncher.Side;
 public class BioLock
 {
 	public static class Blocks {
-		public static BlockBioLock biolock;
+		public static BlockBioLock bioLock;
 		public static BlockPRB prb;
 		public static BlockKeypadLock keypadLock;
 	}
@@ -66,14 +68,8 @@ public class BioLock
 	@SidedProxy(clientSide = "gopheratl.biolock.client.ProxyBioLockClient", serverSide= "gopheratl.biolock.server.ProxyBioLockServer")
     public static ProxyBioLock proxy;
 
-	}
-	
-	public static interface INBTAble {
-		public boolean readFromNBT(NBTBase nbt);
-		public void writeToNBT(NBTTagCompound nbt, String name);
-	}
 
-	public static void resetInstanceManagers()
+	public void resetInstanceManagers()
 	{
 		//System.out.println("[BioLock] [DEBUG] Resetting instance managers..");
 		instanceManagers.put(TileEntityBioLock.class.getSimpleName(), new InstanceDataManager("BioLocks",TileEntityBioLock.getBaseInstanceFileName()));
@@ -86,6 +82,8 @@ public class BioLock
 	
 	public void preInit( FMLPreInitializationEvent evt )
 	{
+		BLLog.init();
+		
 		Configuration configFile = new Configuration(evt.getSuggestedConfigurationFile());
 		
 		Property prop = configFile.get( "general", "bioLock_InternalMemorySize", 16);
@@ -97,32 +95,35 @@ public class BioLock
 
 	public void load(FMLInitializationEvent event)
 	{				
-		BioLock.Blocks.bioLock=new BlockBioLock().setUnlocalizedName("BioLockBlock");
+		ItemStack stone = new ItemStack((Block)Block.blockRegistry.getObject("stone"));
+		ItemStack redstone = new ItemStack((Item)Item.itemRegistry.getObject("redstone"));
+		ItemStack redstone_block = new ItemStack((Block)Block.blockRegistry.getObject("redstone_block"));
+		ItemStack glass_pane = new ItemStack((Block)Block.blockRegistry.getObject("glass_pane"));
+		ItemStack stone_button = new ItemStack((Block)Block.blockRegistry.getObject("stone_button"));
 		
-		GameRegistry.registerBlock(bioLock,ItemBlockProgrammable.class,"blockBioLock");
+		BioLock.Blocks.bioLock=new BlockBioLock();
+		BioLock.Blocks.bioLock.setBlockName("BioLockBlock");
+		
+		GameRegistry.registerBlock(Blocks.bioLock,ItemBlockProgrammable.class,"blockBioLock");
 		GameRegistry.registerTileEntity(TileEntityBioLock.class, "BioLockPeripheral"); 
-		GameRegistry.addRecipe(new ItemStack(bioLock), new Object[] { "SGS","SRS","SGS",'S',Block.stone,'R',Item.redstone,'G',Block.thinGlass});
-		GameRegistry.addRecipe(new RecipeResetProgrammable(bioLock));
-		
-		LanguageRegistry.addName(bioLock,"Biometric Lock");
+		GameRegistry.addRecipe(new ItemStack(Blocks.bioLock), new Object[] { "SGS","SRS","SGS",'S',stone,'R',redstone,'G',glass_pane});
+		GameRegistry.addRecipe(new RecipeResetProgrammable(Blocks.bioLock));
 
-		BioLock.Blocks.prb=new BlockPRB().setUnlocalizedName("PRB");
+		BioLock.Blocks.prb=new BlockPRB();
+		BioLock.Blocks.prb.setBlockName("PRB");
 		
-		GameRegistry.registerBlock(prb,ItemBlockProgrammable.class,"blockPRB");
+		GameRegistry.registerBlock(Blocks.prb,ItemBlockProgrammable.class,"blockPRB");
 		GameRegistry.registerTileEntity(TileEntityPRB.class, "PRBPeripheral");
-		GameRegistry.addRecipe(new ItemStack(prb),new Object[] { "SRS","RBR","SRS",'S',Block.stone,'R',Item.redstone,'B',Block.blockRedstone});		
-		GameRegistry.addRecipe(new RecipeResetProgrammable(prb));
+		GameRegistry.addRecipe(new ItemStack(Blocks.prb),new Object[] { "SRS","RBR","SRS",'S',stone,'R',redstone,'B',redstone_block});		
+		GameRegistry.addRecipe(new RecipeResetProgrammable(Blocks.prb));
 		
-		LanguageRegistry.addName(prb,"PRB");
+		BioLock.Blocks.keypadLock=new BlockKeypadLock();
+		BioLock.Blocks.keypadLock.setBlockName("KeypadLockBlock");
 		
-		BioLock.Blocks.keypadLock=new BlockKeypadLock().setUnlocalizedName("KeypadLockBlock");
-		
-		GameRegistry.registerBlock(keypadLock,ItemBlockProgrammable.class,"blockKeypadLockBlock");
+		GameRegistry.registerBlock(Blocks.keypadLock,ItemBlockProgrammable.class,"blockKeypadLockBlock");
 		GameRegistry.registerTileEntity(TileEntityKeypadLock.class,"KeypadLockPeripheral");
-		GameRegistry.addRecipe(new ItemStack(keypadLock), new Object[] { "BBB", "BBB", "BBB", 'B', Block.stoneButton});
-		GameRegistry.addRecipe(new RecipeResetProgrammable(keypadLock));
-		
-		LanguageRegistry.addName(keypadLock,"Keypad Lock");
+		GameRegistry.addRecipe(new ItemStack(Blocks.keypadLock), new Object[] { "BBB", "BBB", "BBB", 'B', stone_button});
+		GameRegistry.addRecipe(new RecipeResetProgrammable(Blocks.keypadLock));
 		
 		proxy.registerRenderInformation();		
 	}	

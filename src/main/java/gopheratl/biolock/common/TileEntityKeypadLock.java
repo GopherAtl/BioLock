@@ -1,24 +1,27 @@
 package gopheratl.biolock.common;
 
+import gopheratl.biolock.common.network.PacketHandler;
+import gopheratl.biolock.common.network.PacketKeypadButton;
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import cpw.mods.fml.common.network.PacketDispatcher;
-import cpw.mods.fml.common.network.Player;
+import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import dan200.computercraft.api.lua.ILuaContext;
+import dan200.computercraft.api.lua.LuaException;
+import dan200.computercraft.api.peripheral.IComputerAccess;
+import dan200.computercraft.api.peripheral.IPeripheral;
 import net.minecraft.client.entity.EntityClientPlayerMP;
-import net.minecraft.client.multiplayer.NetClientHandler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.Packet250CustomPayload;
-
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.INetworkManager;
-import net.minecraft.network.packet.Packet132TileEntityData;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 
 
@@ -87,14 +90,14 @@ public class TileEntityKeypadLock extends TileEntityProgrammable {
 	{
 		NBTTagCompound nbtTag = new NBTTagCompound();
 		this.writeToNBT(nbtTag);
-		return new Packet132TileEntityData(this.xCoord, this.yCoord, this.zCoord, 1, nbtTag);		
+		return new S35PacketUpdateTileEntity(this.xCoord, this.yCoord, this.zCoord, 1, nbtTag);		
 	}
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void onDataPacket(INetworkManager net, Packet132TileEntityData packet) 
+	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) 
 	{
-		readFromNBT(packet.customParam1);
+		readFromNBT(packet.func_148857_g());
 	}
 
 	public void pressedButton(EntityPlayer player, int i) 
@@ -102,28 +105,9 @@ public class TileEntityKeypadLock extends TileEntityProgrammable {
 		if (!worldObj.isRemote)
 		{
 			System.out.println("[BioLock] [DEBUG] pressButton on server...");
-			Packet250CustomPayload packet=new Packet250CustomPayload();
-			ByteArrayOutputStream outBytes=new ByteArrayOutputStream(17);
-			DataOutputStream dataOut=new DataOutputStream(outBytes);
-			try {
-				dataOut.writeShort(1);
-				dataOut.writeShort(instanceID);
-				dataOut.writeInt(xCoord);
-				dataOut.writeInt(yCoord);
-				dataOut.writeInt(zCoord);
-				dataOut.writeByte((byte)i);
-				packet.data=outBytes.toByteArray();
-				packet.length=outBytes.size();
-				packet.channel="biolock";
-				
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				return;
-			}			
-
+			PacketKeypadButton packet = new PacketKeypadButton((short)instanceID, xCoord, yCoord, zCoord, i);		
 			EntityPlayerMP p=(EntityPlayerMP)player;			
-			PacketDispatcher.sendPacketToAllAround((double)xCoord, (double)yCoord, (double)zCoord, 64, p.dimension, packet);
+			PacketHandler.INSTANCE.sendToAllAround(packet, new NetworkRegistry.TargetPoint(p.dimension, (double)xCoord, (double)yCoord, (double)zCoord, 64d));
 		}
 	}
 	

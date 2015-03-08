@@ -1,13 +1,15 @@
 package gopheratl.biolock.common;
 
-import gopheratl.biolock.common.BioLock.INBTAble;
+import gopheratl.biolock.common.INBTAble;
 
 import java.util.HashMap;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
-
-import dan200.computer.api.IComputerAccess;
+import dan200.computercraft.api.lua.ILuaContext;
+import dan200.computercraft.api.lua.LuaException;
+import dan200.computercraft.api.peripheral.IComputerAccess;
+import dan200.computercraft.api.peripheral.IPeripheral;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagDouble;
@@ -15,9 +17,9 @@ import net.minecraft.nbt.NBTTagInt;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.INetworkManager;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.Packet132TileEntityData;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 
 public class TileEntityPRB extends TileEntityProgrammable {
 	
@@ -42,7 +44,7 @@ public class TileEntityPRB extends TileEntityProgrammable {
 
 		@Override
 		public boolean readFromNBT(NBTBase nbt) {			
-			value=((NBTTagInt)nbt).data;
+			value=((NBTTagInt)nbt).func_150287_d();
 			return true;
 		}
 
@@ -78,7 +80,7 @@ public class TileEntityPRB extends TileEntityProgrammable {
 
 		@Override
 		public boolean readFromNBT(NBTBase nbt) {
-			this.side=sideMap.get(((NBTTagString)nbt).data);
+			this.side=sideMap.get(((NBTTagString)nbt).func_150285_a_());
 			return true;
 		}
 
@@ -386,13 +388,13 @@ public class TileEntityPRB extends TileEntityProgrammable {
 			in=inConst[0];
 		else if (nbt instanceof NBTTagString)
 		{
-			String s=((NBTTagString)nbt).data;
+			String s = ((NBTTagString) nbt).func_150285_a_();
 			Integer side=sideMap.get(s);
 			if (side!=null)
 				in=sideInputs[side];
 		}
 		else if (nbt instanceof NBTTagInt)
-			in=inConst[((NBTTagInt)nbt).data];
+			in=inConst[((NBTTagInt)nbt).func_150287_d()];
 
 		return in;
 				
@@ -596,7 +598,7 @@ public class TileEntityPRB extends TileEntityProgrammable {
 		{
 			//build and send packet to client
 			worldObj.markBlockForUpdate(xCoord,yCoord,zCoord);
-			worldObj.notifyBlocksOfNeighborChange(xCoord, yCoord, zCoord, BioLock.prb);
+			worldObj.notifyBlocksOfNeighborChange(xCoord, yCoord, zCoord, BioLock.Blocks.prb);
 		}		
 
 		super.updateEntity();
@@ -613,24 +615,26 @@ public class TileEntityPRB extends TileEntityProgrammable {
 			for (int i=0; i<6; ++i)
 				list.appendTag(new NBTTagInt(programs[i].output));
 			nbt.setTag("outputs", list);
-			return new Packet132TileEntityData(this.xCoord,this.yCoord,this.zCoord,1,nbt);
+			return new S35PacketUpdateTileEntity(this.xCoord,this.yCoord,this.zCoord,1,nbt);
 		}
 		return null;
 	}
 	
 	@Override 
-	public void onDataPacket(INetworkManager net, Packet132TileEntityData pkt)
+	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt)
 	{
 		if (FMLCommonHandler.instance().getEffectiveSide().isClient())
 		{
 			System.out.println("[BioLock] ("+this+") Client parsing PRB description from server...");
-			NBTTagCompound nbt=pkt.customParam1;
+			NBTTagCompound nbt=pkt.func_148857_g();
 			NBTTagList list=nbt.getTagList("outputs", 3);
-			for (int i=0; i<6; ++i)
+			int i = 0;
+			while (list.tagCount() > 0)
 			{
-				int newVal=((NBTTagInt)list.tagAt(i)).data;
+				int newVal=((NBTTagInt)list.removeTag(1)).func_150287_d();
 				System.out.println("[BioLock] outputs["+i+"] was "+outputs[i]+", now "+newVal);
 				outputs[i]=newVal;
+				i++;
 			}
 			worldObj.markBlockForUpdate(xCoord,yCoord,zCoord);			
 		}		

@@ -25,9 +25,9 @@ public class ProxyBioLockClient extends ProxyBioLock
 			}			
 		}
 						
-		BioLock.bioLock.setCreativeTab(computerTab);		
-		BioLock.prb.setCreativeTab(computerTab);		
-		BioLock.keypadLock.setCreativeTab(computerTab);
+		BioLock.Blocks.bioLock.setCreativeTab(computerTab);		
+		BioLock.Blocks.prb.setCreativeTab(computerTab);		
+		BioLock.Blocks.keypadLock.setCreativeTab(computerTab);
 		
 		ClientRegistry.bindTileEntitySpecialRenderer( TileEntityKeypadLock.class, new TileEntityRendererKeypad());
     }

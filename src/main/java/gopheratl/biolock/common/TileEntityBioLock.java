@@ -3,6 +3,8 @@ package gopheratl.biolock.common;
 import gopheratl.GopherCore.GopherCore;
 import gopheratl.GopherCore.InstanceDataManager;
 import gopheratl.biolock.common.TileEntityProgrammable.FileMount;
+import gopheratl.biolock.common.network.PacketBiolockScan;
+import gopheratl.biolock.common.network.PacketHandler;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -32,17 +34,20 @@ import com.google.common.primitives.Bytes;
 
 
 
+
+
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagInt;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
-import net.minecraft.network.packet.Packet250CustomPayload;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.tileentity.TileEntity;
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.relauncher.Side;
 import dan200.computercraft.api.lua.ILuaContext;
 import dan200.computercraft.api.lua.LuaException;
@@ -394,7 +399,7 @@ public class TileEntityBioLock extends TileEntityProgrammable {
 		
 		if (outputChanged)
 		{
-			worldObj.notifyBlocksOfNeighborChange(xCoord, yCoord, zCoord, BioLock.Blocks.biolock);
+			worldObj.notifyBlocksOfNeighborChange(xCoord, yCoord, zCoord, BioLock.Blocks.bioLock);
 			outputChanged=false;
 		}
 		
@@ -713,21 +718,10 @@ public class TileEntityBioLock extends TileEntityProgrammable {
 					}
 				}
 
-				Packet250CustomPayload packet=new Packet250CustomPayload();
-				ByteArrayOutputStream outBytes=new ByteArrayOutputStream(17);
-				DataOutputStream dataOut=new DataOutputStream(outBytes);
-
-				dataOut.writeShort(2);
-				dataOut.writeShort(instanceID);
-				dataOut.writeInt(xCoord);
-				dataOut.writeInt(yCoord);
-				dataOut.writeInt(zCoord);
-				packet.data=outBytes.toByteArray();
-				packet.length=outBytes.size();
-				packet.channel="biolock";
+				PacketBiolockScan packet = new PacketBiolockScan((short) instanceID, xCoord, yCoord, zCoord);
 				
 				EntityPlayerMP p=(EntityPlayerMP)player;			
-				PacketDispatcher.sendPacketToAllAround((double)xCoord, (double)yCoord, (double)zCoord, 64, p.dimension, packet);
+				PacketHandler.INSTANCE.sendToAllAround(packet, new NetworkRegistry.TargetPoint(p.dimension, (double)xCoord, (double)yCoord, (double)zCoord, 64d));
 				
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -739,20 +733,6 @@ public class TileEntityBioLock extends TileEntityProgrammable {
 	{
 		animating=true;
 		faceFrameIndex=0;
-	}
-
-	@Override
-	public Object[] callMethod(IComputerAccess computer, ILuaContext context,
-			int method, Object[] arguments) throws LuaException,
-			InterruptedException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean equals(IPeripheral other) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 }

@@ -4,7 +4,6 @@ import gopheratl.GopherCore.GopherCore;
 import gopheratl.GopherCore.InstanceDataManager;
 import gopheratl.biolock.common.TileEntityBioLock.RedstoneProgram;
 import gopheratl.biolock.common.TileEntityBioLock.StoredPrint;
-import gopheratl.biolock.common.network.BiolockPacketHandler.BioPacket;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -22,12 +21,15 @@ import java.util.Iterator;
 import java.util.Map;
 
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.network.Player;
 import cpw.mods.fml.relauncher.Side;
+import dan200.computercraft.api.lua.ILuaContext;
+import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.nbt.NBTSizeTracker;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagInt;
 import net.minecraft.nbt.NBTTagList;
@@ -236,7 +238,7 @@ public abstract class TileEntityProgrammable extends TileEntity implements IPeri
 				//System.out.println("[BioLock] [DEBUG] new world, resetting instance managers...");
 				loadedWorldDir=curWorldDir;
 				//new world means new instance managers, kill old ones
-				BioLock.resetInstanceManagers();
+				BioLock.instance.resetInstanceManagers();
 			}
 		}
 
@@ -373,7 +375,7 @@ public abstract class TileEntityProgrammable extends TileEntity implements IPeri
 				try {
 					dataIn = new DataInputStream(new FileInputStream(inFile));
 					nbt=new NBTTagCompound();
-					nbt=(NBTTagCompound)NBTTagCompound.readNamedTag(dataIn);
+					nbt=CompressedStreamTools.readCompressed(dataIn);
 					dataIn.close();
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
@@ -396,11 +398,11 @@ public abstract class TileEntityProgrammable extends TileEntity implements IPeri
 				}
 				
 				//private HashMap<Integer,Integer> computerLevels;
-			    NBTTagList puters=nbt.getTagList("puterIDs");
-			    NBTTagList levels=nbt.getTagList("puterLvls");
+			    NBTTagList puters=nbt.getTagList("puterIDs", 3);
+			    NBTTagList levels=nbt.getTagList("puterLvls", 3);
 
-			    for (int i=0; i<puters.tagCount(); ++i)			    	
-					computerLevels.put(((NBTTagInt)puters.tagAt(i)).data,((NBTTagInt)levels.tagAt(i)).data);
+			    while (puters.tagCount() > 0)
+					computerLevels.put(((NBTTagInt)puters.removeTag(1)).func_150287_d(),((NBTTagInt)levels.removeTag(1)).func_150287_d());
 					
 				readInstanceFromNBT(nbt);
 			}
@@ -431,8 +433,8 @@ public abstract class TileEntityProgrammable extends TileEntity implements IPeri
 				while (iter.hasNext())
 				{
 					int k=iter.next();
-					puters.appendTag(new NBTTagInt(null,k));
-					levels.appendTag(new NBTTagInt(null,computerLevels.get(k)));
+					puters.appendTag(new NBTTagInt(k));
+					levels.appendTag(new NBTTagInt(computerLevels.get(k)));
 				}
 			    
 			    nbt.setTag("puterIDs", puters);
@@ -444,7 +446,7 @@ public abstract class TileEntityProgrammable extends TileEntity implements IPeri
 				DataOutputStream dataOut=null;
 				try {
 					dataOut = new DataOutputStream(new FileOutputStream(outFile));
-					NBTTagCompound.writeNamedTag(nbt, dataOut);
+					CompressedStreamTools.writeCompressed(nbt, dataOut);
 					dataOut.close();
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
@@ -513,12 +515,6 @@ public abstract class TileEntityProgrammable extends TileEntity implements IPeri
     	if (instanceID>0)
     		loadInstanceData();
     }
-    
-	@Override
-	public boolean canAttachToSide(int side) 
-	{
-		return side!=getFacing();
-	}
 
 	@Override
 	public void attach(IComputerAccess computer)
@@ -581,7 +577,7 @@ public abstract class TileEntityProgrammable extends TileEntity implements IPeri
 	}
 
 	@Override
-	public Object[] callMethod(IComputerAccess computer, int methodIndex, Object[] arguments)
+	public Object[] callMethod(IComputerAccess computer, ILuaContext context, int methodIndex, Object[] arguments) throws LuaException, InterruptedException
 	{
 		try {
 			PeripheralMethod method=methods.get(methodIndex);
@@ -610,6 +606,11 @@ public abstract class TileEntityProgrammable extends TileEntity implements IPeri
 			ex.printStackTrace();
 			return new Object[] { false, " O_o How'd you do that?" };
 		}
+	}
+	
+	@Override
+	public boolean equals(IPeripheral other) {
+		return false;
 	}
 	
 }
