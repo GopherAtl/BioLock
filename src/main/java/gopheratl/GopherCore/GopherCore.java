@@ -1,6 +1,7 @@
 package gopheratl.GopherCore;
 
 import gopheratl.biolock.common.TileEntityBioLock;
+import gopheratl.biolock.common.util.BLLog;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -9,12 +10,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.apache.logging.log4j.Level;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
 
 public class GopherCore {
     static String saveDirectory=null;
-    		
+    	
 	public static String getSaveDirectory()
 	{
 		//on first access, build it
@@ -24,9 +29,11 @@ public class GopherCore {
 			File basePath=server.getFile("");			
 			String worldName=server.getFolderName();
 			if (worldName==null)
-				System.out.println("getSaveDirectory got null from getFolderName!");
+				GCLog.info("getSaveDirectory got null from getFolderName!");
+			GCLog.info("world folder: %s", worldName);
+			GCLog.info("base path: %s", basePath);
 			saveDirectory=basePath+File.separator;
-			if(!(server instanceof DedicatedServer))
+			if(!(server.isDedicatedServer()))
 				saveDirectory+="saves"+File.separator;
 			saveDirectory+=worldName+File.separator;
 		}
@@ -39,13 +46,13 @@ public class GopherCore {
 		String path=getSaveDirectory()+folderName;
 		File f=new File(path);
 		if ((f.exists() && !f.isDirectory()) || (!f.exists()  && !new File(path).mkdirs()))			
-			System.out.println("[GopherCore] Couldn't create directory \""+path+"\"");
+			GCLog.info("Couldn't create directory \"%s\"", path);
 
 		try {
 			return f.getCanonicalPath()+File.separator;
 		} catch(Exception e) {
 			//This shouldn't happen, but java will bitch if I don't handle it...
-			System.out.println("[GopherCore] getSaveSubDirPath: Exception from getCanonicalPath?");
+			GCLog.info("getSaveSubDirPath: Exception from getCanonicalPath?");
 			return null;
 		}
 	}	
@@ -53,24 +60,24 @@ public class GopherCore {
 	public static void exportPackageFile(String sourcePath, String targetDir, String targetName)
 	{
 		
-		//System.out.println("[GopherCore] exportPackageFile("+sourcePath+","+targetDir+","+targetName+")");
+		GCLog.info("exportPackageFile(%s,%s,%s)", sourcePath, targetDir, targetName);
 		InputStream stream=TileEntityBioLock.class.getClassLoader().getResourceAsStream(sourcePath);
 		MinecraftServer server=MinecraftServer.getServer();
 		File basePath=server.getFile("");			
 		File f=new File(basePath+File.separator+"mods"+File.separator+targetDir);
 		if (!f.exists())
 		{
-			//System.out.println("[BioLock] [Debug] making dir "+f);
+			BLLog.log(Level.DEBUG, "making dir %s", f);
 			f.mkdirs();			
 		}
 		else if (!f.isDirectory())
 		{
-			System.out.println("[GopherCore] [ERROR] file export blocked by directory with target name!");
+			GCLog.severe("file export blocked by directory with target name!");
 			return;
 		}
 			
 		File outFile=new File(basePath+File.separator+"mods"+File.separator+targetDir+targetName);
-		//System.out.println("[BioLock] [Debug] outFile== "+outFile);
+		BLLog.log(Level.DEBUG, "[BioLock] [Debug] outFile== %s", outFile);
 		if (outFile.exists()==false)
 		{
 			try {
@@ -83,10 +90,10 @@ public class GopherCore {
 				stream.close();
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
-				System.out.println("[GopherCore] FileNotFoundException extracting lua files");
+				GCLog.info("FileNotFoundException extracting lua files");
 				e.printStackTrace();
 			} catch (IOException e) {
-				System.out.println("[GopherCore] IOException extracting lua files");
+				GCLog.info("IOException extracting lua files");
 				e.printStackTrace();
 			}
 		}

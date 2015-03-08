@@ -1,9 +1,12 @@
 package gopheratl.biolock.common;
 
 import gopheratl.GopherCore.InstanceDataManager;
+import gopheratl.biolock.common.util.BLLog;
+import gopheratl.biolock.server.ProxyBioLockServer;
 
 import java.util.List;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
@@ -25,11 +28,11 @@ public class ItemBlockProgrammable extends ItemBlock {
 	public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ, int metadata)
     {
 		boolean result=super.placeBlockAt(stack, player, world, x, y, z, side, hitX,hitY, hitZ, metadata);
-		if (result && !world.isRemote)
+		if (result && FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER)
         {
         	TileEntity te=world.getTileEntity(x,y,z);
         	if (te==null)
-        		System.out.println("[BioLock] [PRB] TE is null!");
+        		BLLog.debug("[PRB] TE is null!");
         	
         	if (te instanceof TileEntityProgrammable)
         	{
@@ -40,7 +43,7 @@ public class ItemBlockProgrammable extends ItemBlock {
         		{
         			InstanceDataManager instanceManager=BioLock.getInstanceManager(te.getClass());
         			if (instanceManager==null)
-        				System.out.println("[BioLock] [PRB] instanceManager is null!");
+        				BLLog.debug("[PRB] instanceManager is null!");
         			else
         				tep.setInstanceID(instanceManager.getNextID());
         		}

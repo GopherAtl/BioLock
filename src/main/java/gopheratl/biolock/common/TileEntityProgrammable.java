@@ -4,6 +4,8 @@ import gopheratl.GopherCore.GopherCore;
 import gopheratl.GopherCore.InstanceDataManager;
 import gopheratl.biolock.common.TileEntityBioLock.RedstoneProgram;
 import gopheratl.biolock.common.TileEntityBioLock.StoredPrint;
+import gopheratl.biolock.common.util.BLLog;
+import gopheratl.biolock.server.ProxyBioLockServer;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -19,6 +21,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+
+import org.apache.logging.log4j.Level;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
@@ -227,15 +231,22 @@ public abstract class TileEntityProgrammable extends TileEntity implements IPeri
 	
 	public TileEntityProgrammable()
 	{
-		//System.out.println("[BioLock] [DEBUG] TileEntityProgrammable() (class:"+this.getClass().getSimpleName());
+		BLLog.debug("TileEntityProgrammable() (class:%s)", this.getClass().getSimpleName());
+		BLLog.debug("Equality check: %b", BioLock.proxy instanceof ProxyBioLockServer);
+		BLLog.debug("WorldObj null check: %b", (worldObj == null));
+		if (worldObj != null) {
+			BLLog.debug("WorldObj remote check: %b", (worldObj.isRemote));
+		}
+		BLLog.debug("Relauncher check: %b", FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER);
+		//hacky but apparently successful way to detect server side, where !worldObj.isRemote won't work.
 		if (FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER)
 		{
-			//System.out.println("[BioLock] [DEBUG] Server...");
+			BLLog.debug("Server...");
 			//get the current world and check against the last we loaded
 			String curWorldDir=GopherCore.getSaveSubDirPath("biolocks");
 			if (loadedWorldDir==null || !curWorldDir.equals(loadedWorldDir))
 			{
-				//System.out.println("[BioLock] [DEBUG] new world, resetting instance managers...");
+				BLLog.debug("new world, resetting instance managers...");
 				loadedWorldDir=curWorldDir;
 				//new world means new instance managers, kill old ones
 				BioLock.instance.resetInstanceManagers();
@@ -411,7 +422,7 @@ public abstract class TileEntityProgrammable extends TileEntity implements IPeri
 
 	public void saveInstanceData()
 	{		
-		if(true) //TODO: shouldSaveData? 
+		if(BioLock.proxy instanceof ProxyBioLockServer) //TODO: shouldSaveData? 
 		{
 			File outFile=new File(BioLock.getInstanceManager(this.getClass()).getFilePath(instanceID));
 			if (!outFile.exists() || outFile.canWrite())

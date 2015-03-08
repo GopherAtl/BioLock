@@ -2,6 +2,8 @@ package gopheratl.biolock.common.network;
 
 import gopheratl.biolock.common.TileEntityKeypadLock;
 import gopheratl.biolock.common.util.BLLog;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
@@ -17,16 +19,16 @@ public class HandlerKeypadButton implements IMessageHandler<PacketKeypadButton, 
 
 	@Override
 	public IMessage onMessage(PacketKeypadButton message, MessageContext ctx) {
-		EntityPlayerMP player = ctx.getServerHandler().playerEntity;
+		EntityClientPlayerMP player = Minecraft.getMinecraft().thePlayer;
 		short instanceID = message.id;
 		int x = message.x;
 		int y = message.y;
 		int z = message.z;
 		
-		BLLog.log(Level.DEBUG, "TE packet at %d, %d, %d", x, y, z);
+		BLLog.debug("TE packet at %d, %d, %d", x, y, z);
 		
 		World world=null;
-		if (player instanceof EntityPlayerMP)		
+		if (player instanceof EntityClientPlayerMP)		
 		{
 			for (World w : DimensionManager.getWorlds())
 				if (w.playerEntities.contains(player))
@@ -36,12 +38,12 @@ public class HandlerKeypadButton implements IMessageHandler<PacketKeypadButton, 
 				}
 		}
 		else
-			world=((EntityPlayerMP)player).worldObj;
+			world=((EntityClientPlayerMP)player).worldObj;
 		
 		TileEntity te=world.getTileEntity(x, y, z);
 		
 		int button = message.button;
-		BLLog.log(Level.DEBUG, "got button for button # %d", button);
+		BLLog.debug("Got button for button # %d", button);
 		
 		TileEntityKeypadLock tek=(TileEntityKeypadLock)te;
 		tek.buttonStates[button].press(te.getWorldObj().getTotalWorldTime());

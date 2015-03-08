@@ -1,5 +1,8 @@
 package gopheratl.biolock.common;
 
+import gopheratl.biolock.client.BiolockRenderer;
+import gopheratl.biolock.common.util.BLLog;
+
 import java.util.Random;
 
 import net.minecraft.block.Block;
@@ -7,6 +10,7 @@ import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -21,7 +25,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 public class BlockBioLock extends BlockProgrammable {
-    
+	
 	static IIcon textureTop;
 	static IIcon textureSide;
 	static IIcon textureBottom;
@@ -30,23 +34,29 @@ public class BlockBioLock extends BlockProgrammable {
 	public BlockBioLock() 
 	{
 		super(TileEntityBioLock.class);
+		setCreativeTab(CreativeTabs.tabMisc);
 	}	
 	
 	public void registerBlockIcons(IIconRegister iconRegister)
 	{
-		textureTop=iconRegister.registerIcon("BioLock:biolock_top");
-		textureBottom=iconRegister.registerIcon("BioLock:biolock_bottom");
-		textureSide=iconRegister.registerIcon("BioLock:biolock_side");
+		textureTop=iconRegister.registerIcon("biolock:biolock_top");
+		textureBottom=iconRegister.registerIcon("biolock:biolock_bottom");
+		textureSide=iconRegister.registerIcon("biolock:biolock_side");
 		
 		texturesFront=new IIcon[13];
 		for (int i=0; i<13; ++i)
-			texturesFront[i]=iconRegister.registerIcon("BioLock:biolock_front"+i);		
+			texturesFront[i]=iconRegister.registerIcon("biolock:biolock_front"+i);		
 		
+	}
+
+	public int getRenderType() {
+		return BiolockRenderer.model;
 	}
 
     @SideOnly(Side.CLIENT)
     public IIcon getIcon(IBlockAccess blockAccess, int x, int y, int z, int side)
     {
+  
         if (side == 0)
             return textureBottom;
 
@@ -54,8 +64,9 @@ public class BlockBioLock extends BlockProgrammable {
     		return textureTop;
         
         int facingSide = blockAccess.getBlockMetadata(x,y,z);
-        TileEntityBioLock tileEntity = (TileEntityBioLock)blockAccess.getTileEntity(x,y,z);       
-        return side == facingSide ? texturesFront[ tileEntity.faceFrameIndex ]: textureSide;
+        TileEntityBioLock tileEntity = (TileEntityBioLock)blockAccess.getTileEntity(x,y,z);
+        BLLog.debug("Block frame index: %d", tileEntity.clientFrameIndex);
+        return side == facingSide ? texturesFront[ tileEntity.clientFrameIndex ]: textureSide;
     }
    
     
