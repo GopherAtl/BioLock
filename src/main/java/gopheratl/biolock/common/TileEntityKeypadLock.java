@@ -105,7 +105,7 @@ public class TileEntityKeypadLock extends TileEntityProgrammable {
 		if (!worldObj.isRemote)
 		{
 			System.out.println("[BioLock] [DEBUG] pressButton on server...");
-			PacketKeypadButton packet = new PacketKeypadButton((short)instanceID, xCoord, yCoord, zCoord, i);		
+			PacketKeypadButton packet = new PacketKeypadButton((short)instanceID, worldObj.provider.dimensionId, xCoord, yCoord, zCoord, i);		
 			EntityPlayerMP p=(EntityPlayerMP)player;			
 			PacketHandler.INSTANCE.sendToAllAround(packet, new NetworkRegistry.TargetPoint(p.dimension, (double)xCoord, (double)yCoord, (double)zCoord, 64d));
 		}

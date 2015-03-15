@@ -5,12 +5,14 @@ import gopheratl.GopherCore.GopherCore;
 import gopheratl.GopherCore.InstanceDataManager;
 import gopheratl.biolock.client.BiolockRenderer;
 import gopheratl.biolock.common.network.PacketHandler;
+import gopheratl.biolock.common.peripheral.LuaMount;
 import gopheratl.biolock.common.util.BLLog;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Set;
+
 
 
 
@@ -72,7 +74,12 @@ public class BioLock
 	@Instance(value = "BioLock")
 	public static BioLock instance;
 	
-	public int[] foo={1,2,3};
+	public static String LUA_PATH;
+	public static String EXTRACTED_LUA_PATH;
+	
+	public static LuaMount mount = new LuaMount();
+	
+	//public int[] foo={1,2,3};
 	
 	private static HashMap<String,InstanceDataManager> instanceManagers=new HashMap<String,InstanceDataManager>();	
 	
@@ -112,6 +119,9 @@ public class BioLock
 		BLLog.init();
 		GCLog.init();
 		BLLog.debug("Starting pre-init");
+		
+		LUA_PATH = "/assets/biolock/lua";
+		EXTRACTED_LUA_PATH = String.format("mods/BioLocks/%s/lua", FMLCommonHandler.instance().findContainerFor(BioLock.instance).getVersion());
 		
 		Configuration configFile = new Configuration(evt.getSuggestedConfigurationFile());
 		

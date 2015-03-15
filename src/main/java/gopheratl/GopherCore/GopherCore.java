@@ -56,47 +56,4 @@ public class GopherCore {
 			return null;
 		}
 	}	
-	
-	public static void exportPackageFile(String sourcePath, String targetDir, String targetName)
-	{
-		
-		GCLog.info("exportPackageFile(%s,%s,%s)", sourcePath, targetDir, targetName);
-		InputStream stream=TileEntityBioLock.class.getClassLoader().getResourceAsStream(sourcePath);
-		MinecraftServer server=MinecraftServer.getServer();
-		File basePath=server.getFile("");			
-		File f=new File(basePath+File.separator+"mods"+File.separator+targetDir);
-		if (!f.exists())
-		{
-			BLLog.log(Level.DEBUG, "making dir %s", f);
-			f.mkdirs();			
-		}
-		else if (!f.isDirectory())
-		{
-			GCLog.severe("file export blocked by directory with target name!");
-			return;
-		}
-			
-		File outFile=new File(basePath+File.separator+"mods"+File.separator+targetDir+targetName);
-		BLLog.log(Level.DEBUG, "[BioLock] [Debug] outFile== %s", outFile);
-		if (outFile.exists()==false)
-		{
-			try {
-				OutputStream outStream=new FileOutputStream(outFile);
-				byte[] buffer=new byte[256];
-				int bytesRead;
-				while((bytesRead=stream.read(buffer)) !=-1)
-					outStream.write(buffer,0,bytesRead);		
-				outStream.close();
-				stream.close();
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				GCLog.info("FileNotFoundException extracting lua files");
-				e.printStackTrace();
-			} catch (IOException e) {
-				GCLog.info("IOException extracting lua files");
-				e.printStackTrace();
-			}
-		}
-		
-	}
 }

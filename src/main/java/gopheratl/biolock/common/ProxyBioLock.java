@@ -1,11 +1,20 @@
 package gopheratl.biolock.common;
 
+import java.io.File;
+import java.io.IOException;
+
 import gopheratl.biolock.common.BioLock.Blocks;
 import gopheratl.biolock.common.util.BLLog;
+import gopheratl.biolock.common.util.ResourceExtractingUtils;
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.FMLLaunchHandler;
 
 public class ProxyBioLock {
     
@@ -16,6 +25,7 @@ public class ProxyBioLock {
     public void init() {
     	registerRecipes();
     	registerRenderInformation();
+    	setupLuaFiles();
     }
 	
 	protected void registerRenderInformation() {
@@ -59,6 +69,44 @@ public class ProxyBioLock {
 		
 		GameRegistry.addRecipe(new ItemStack(Blocks.keypadLock), new Object[] { "BBB", "BBB", "BBB", 'B', stone_button});
 		GameRegistry.addRecipe(new RecipeResetProgrammable(Blocks.keypadLock));
+	}
+
+	public File getBase() {
+		if (FMLLaunchHandler.side().isClient()) {
+            return Minecraft.getMinecraft().mcDataDir;
+		} else {
+			return new File(".");
+		}
+	}
+	
+	public boolean setupLuaFiles() {
+		BLLog.debug("Extracting Lua files");
+		ModContainer container = FMLCommonHandler.instance().findContainerFor(BioLock.instance);
+		File modFile = container.getSource();
+		File baseFile = getBase();
+		if (modFile.isDirectory()) {
+			File srcFile = new File(modFile, BioLock.LUA_PATH);
+			File destFile = new File(baseFile, BioLock.EXTRACTED_LUA_PATH);
+			if (destFile.exists()) {
+				return false;
+			}
+			try {
+				ResourceExtractingUtils.copy(srcFile, destFile);
+			} catch (IOException e) {
+			}
+		} else {
+			File destFile = new File(BioLock.proxy.getBase(), BioLock.EXTRACTED_LUA_PATH);
+			if (destFile.exists()) {
+				return false;
+			}
+			ResourceExtractingUtils.extractZipToLocation(modFile, BioLock.LUA_PATH, BioLock.EXTRACTED_LUA_PATH);
+		}
+		return true;
+	}
+
+	public World getWorld(int dimId) {
+		//overridden separately for client and server.
+		return null;
 	}
 
 }

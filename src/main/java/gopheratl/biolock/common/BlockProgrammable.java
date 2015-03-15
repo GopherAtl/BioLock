@@ -74,7 +74,7 @@ public abstract class BlockProgrammable extends BlockContainer {
 			System.out.println("[BioLock] IllegalAccessException - Failed instantiating TE \""+teClass.getName()+"\"!");
 			e.printStackTrace();
 		}
-    	finally { }  
+    	finally { }
     	
     	return null;
     }

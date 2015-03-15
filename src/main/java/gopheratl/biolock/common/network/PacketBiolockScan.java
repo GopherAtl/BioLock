@@ -9,9 +9,10 @@ public class PacketBiolockScan extends PacketProgrammable {
 		//intentionally empty
 	}
 	
-	public PacketBiolockScan(short instance, int x, int y, int z, int frame) {
+	public PacketBiolockScan(short instance, int dim, int x, int y, int z, int frame) {
 		this.id = 2;
 		this.instance = instance;
+		this.dimension = dim;
 		this.x = x;
 		this.y = y;
 		this.z = z;

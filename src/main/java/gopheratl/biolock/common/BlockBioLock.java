@@ -43,14 +43,10 @@ public class BlockBioLock extends BlockProgrammable {
 		textureBottom=iconRegister.registerIcon("biolock:biolock_bottom");
 		textureSide=iconRegister.registerIcon("biolock:biolock_side");
 		
-		texturesFront=new IIcon[13];
-		for (int i=0; i<13; ++i)
+		texturesFront=new IIcon[12];
+		for (int i=0; i<12; ++i)
 			texturesFront[i]=iconRegister.registerIcon("biolock:biolock_front"+i);		
 		
-	}
-
-	public int getRenderType() {
-		return BiolockRenderer.model;
 	}
 
     @SideOnly(Side.CLIENT)
@@ -65,6 +61,10 @@ public class BlockBioLock extends BlockProgrammable {
         
         int facingSide = blockAccess.getBlockMetadata(x,y,z);
         TileEntityBioLock tileEntity = (TileEntityBioLock)blockAccess.getTileEntity(x,y,z);
+        if (tileEntity == null) {
+        	BLLog.debug("Block tile entity is null!");
+        	return side == facingSide ? texturesFront[0] : textureSide;
+        }
         BLLog.debug("Block frame index: %d", tileEntity.clientFrameIndex);
         return side == facingSide ? texturesFront[ tileEntity.clientFrameIndex ]: textureSide;
     }
@@ -76,6 +76,35 @@ public class BlockBioLock extends BlockProgrammable {
     {
         return side == 1 ? textureTop : side == 4 ? texturesFront[9] : textureSide;
     }
+	
+	@Override
+	public boolean shouldSideBeRendered(IBlockAccess blockAccess, int x, int y, int z, int side)
+	{		
+		if (side>1)
+		{
+			int mx=x, my=y, mz=z;
+		    switch(side)
+			{
+  			case 2: mz++; break;
+			case 3: mz--; break;
+			case 4: mx++; break;
+			case 5: mx--; break;
+			}			
+
+		    int facing=blockAccess.getBlockMetadata(mx, my, mz);
+			if (facing==side)
+				return false;			
+		}
+			
+		return super.shouldSideBeRendered(blockAccess,x,y,z,side);
+		/**/
+	}
+	
+	@Override
+	public boolean isOpaqueCube()
+	{
+		return false;
+	}
     
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ)
     {    	

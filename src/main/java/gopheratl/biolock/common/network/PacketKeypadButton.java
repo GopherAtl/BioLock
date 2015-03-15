@@ -9,9 +9,10 @@ public class PacketKeypadButton extends PacketProgrammable {
 		//intentionally empty
 	}
 	
-	public PacketKeypadButton(short instance, int x, int y, int z, int button) {
+	public PacketKeypadButton(short instance, int dim, int x, int y, int z, int button) {
 		this.id = 1;
 		this.instance = instance;
+		this.dimension = dim;
 		this.x = x;
 		this.y = y;
 		this.z = z;

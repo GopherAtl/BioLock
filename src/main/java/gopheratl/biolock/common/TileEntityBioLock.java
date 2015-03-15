@@ -2,7 +2,6 @@ package gopheratl.biolock.common;
 
 import gopheratl.GopherCore.GopherCore;
 import gopheratl.GopherCore.InstanceDataManager;
-import gopheratl.biolock.common.TileEntityProgrammable.FileMount;
 import gopheratl.biolock.common.network.PacketBiolockScan;
 import gopheratl.biolock.common.network.PacketHandler;
 import gopheratl.biolock.common.util.BLLog;
@@ -32,17 +31,6 @@ import org.apache.logging.log4j.Level;
 import org.lwjgl.input.Keyboard;
 
 import com.google.common.primitives.Bytes;
-
-
-
-
-
-
-
-
-
-
-
 
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.entity.player.EntityPlayer;
@@ -190,20 +178,12 @@ public class TileEntityBioLock extends TileEntityProgrammable {
 			return !invertOutput;			
 		}
 	}
-
-	private static FileMount[] fileMounts = new FileMount[] {new FileMount("biolock","rom/programs/")};
-	
-	@Override
-	protected FileMount[] getFileMounts()
-	{
-		return fileMounts;
-	}
 	
 	//******* Instance Variables
 	//index of the current face texture
-	int faceFrameIndex;
-	@SideOnly(Side.CLIENT)
-	int clientFrameIndex;
+	public int faceFrameIndex;
+	//index for client use, current face texture
+	public int clientFrameIndex;
 	//frame tick counter, used in controlling face animation 
 	int frameTicks;
 	//unique ID of this instance, for associating with internal data; -1 if none
@@ -441,15 +421,10 @@ public class TileEntityBioLock extends TileEntityProgrammable {
     	BLLog.debug("Animating step: %d, t: %d", faceFrameIndex, frameTicks);
     	if (faceFrameIndex != oldIndex) {
     		BLLog.debug("Sending packet");
-	    	PacketBiolockScan packet = new PacketBiolockScan((short) instanceID, xCoord, yCoord, zCoord, faceFrameIndex);
+	    	PacketBiolockScan packet = new PacketBiolockScan((short) instanceID, worldObj.provider.dimensionId, xCoord, yCoord, zCoord, faceFrameIndex);
+	    	clientFrameIndex = faceFrameIndex;
 						
 			PacketHandler.INSTANCE.sendToAllAround(packet, new NetworkRegistry.TargetPoint(worldObj.provider.dimensionId, (double)xCoord, (double)yCoord, (double)zCoord, 64d));
-			worldObj.markBlockForUpdate(xCoord,yCoord,zCoord);
-			worldObj.markBlockRangeForRenderUpdate(xCoord, yCoord, zCoord, xCoord, yCoord, zCoord);
-			worldObj.func_147479_m(xCoord, yCoord, zCoord);
-			worldObj.notifyBlockOfNeighborChange(xCoord, yCoord, zCoord, getBlockType());
-			worldObj.setBlockMetadataWithNotify(xCoord, yCoord, zCoord, this.getBlockMetadata(), 3);
-			worldObj.scheduleBlockUpdate(xCoord, yCoord, zCoord, getBlockType(), 0);
     	}
 		return finished;
     }
@@ -747,7 +722,7 @@ public class TileEntityBioLock extends TileEntityProgrammable {
 
 				animating = true;
 				faceFrameIndex = 0;
-				PacketBiolockScan packet = new PacketBiolockScan((short) instanceID, xCoord, yCoord, zCoord, faceFrameIndex);
+				PacketBiolockScan packet = new PacketBiolockScan((short) instanceID, worldObj.provider.dimensionId, xCoord, yCoord, zCoord, faceFrameIndex);
 				
 				EntityPlayerMP p=(EntityPlayerMP)player;			
 				PacketHandler.INSTANCE.sendToAllAround(packet, new NetworkRegistry.TargetPoint(p.dimension, (double)xCoord, (double)yCoord, (double)zCoord, 64d));
@@ -761,12 +736,9 @@ public class TileEntityBioLock extends TileEntityProgrammable {
 	public void doAnimate(int frame) 
 	{
 		BLLog.debug("Animating frame %d at %d, %d, %d", frame, xCoord, yCoord, zCoord);
-		clientFrameIndex=frame;
-		worldObj.markBlockForUpdate(xCoord,yCoord,zCoord);
-		worldObj.markBlockRangeForRenderUpdate(xCoord, yCoord, zCoord, xCoord, yCoord, zCoord);
-		worldObj.func_147479_m(xCoord, yCoord, zCoord);
-		worldObj.notifyBlockOfNeighborChange(xCoord, yCoord, zCoord, getBlockType());
-		worldObj.scheduleBlockUpdate(xCoord, yCoord, zCoord, getBlockType(), 0);
+		BLLog.debug("Animating, old value was %d, new value is %d", clientFrameIndex, frame);
+		clientFrameIndex = frame;
+		faceFrameIndex = frame;
 
 	}
 

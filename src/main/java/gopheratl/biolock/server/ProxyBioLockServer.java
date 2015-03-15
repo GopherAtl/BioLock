@@ -16,10 +16,23 @@ import java.util.regex.Pattern;
 
 
 
+
+
+
+
+
+
+
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.World;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.FMLLaunchHandler;
 import gopheratl.biolock.common.BioLock;
 import gopheratl.biolock.common.BlockBioLock;
 import gopheratl.biolock.common.BlockKeypadLock;
@@ -32,8 +45,12 @@ import gopheratl.biolock.common.TileEntityKeypadLock;
 import gopheratl.biolock.common.TileEntityPRB;
 import gopheratl.biolock.common.BioLock.Blocks;
 import gopheratl.biolock.common.util.BLLog;
+import gopheratl.biolock.common.util.ResourceExtractingUtils;
 
 public class ProxyBioLockServer extends ProxyBioLock 
 {
-
+	@Override
+	public World getWorld(int dimId) {
+		return MinecraftServer.getServer().worldServerForDimension(dimId);
+	}
 }

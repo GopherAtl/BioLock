@@ -173,33 +173,6 @@ public abstract class TileEntityProgrammable extends TileEntity implements IPeri
 		}
 	}
 	
-	
-	protected static class FileMount {
-		public String name;
-		public String mountDir;
-		
-		public FileMount(String name, String mountDir)
-		{
-			this.name=name;
-			this.mountDir=mountDir;
-			
-			//export...
-			GopherCore.exportPackageFile("gopheratl/biolock/lua/"+name+".lua","BioLocks"+File.separator+"lua"+File.separator,name+".lua");
-		}
-		
-		public void mount(IComputerAccess computer)
-		{
-			String basePath=GopherCore.getSaveSubDirPath("biolocks"+File.separator+"lua"+File.separator);
-			System.out.println(mountDir+" from "+basePath+name+".lua");
-			//computer.mountFixedDir(mountDir+name,"mods/BioLock/lua/"+name+".lua", true, 0);			
-		}
-	}
-	
-	protected FileMount[] getFileMounts()
-	{
-		return null;
-	}
-	
 	//**********************
 	//  Instance members
 
@@ -543,15 +516,9 @@ public abstract class TileEntityProgrammable extends TileEntity implements IPeri
 			
 		computerPeripheralCounts.put(key, count+1);
 		
-		FileMount[] fileMounts=getFileMounts();
-		System.out.println("[BioLock] [DEBUG] Mounting files to "+computer.getID()+", assuming "+fileMounts+"!=null and "+count+"==0");
-		if (fileMounts!=null && count==0)
+		if (count==0)
 		{
-			for (int i=0;i<fileMounts.length;++i)
-			{
-				System.out.println("Mounting "+fileMounts[i].name+" to "+fileMounts[i].mountDir);
-				fileMounts[i].mount(computer);
-			}
+			computer.mount("biolock", BioLock.mount);
 		}
 	}
 

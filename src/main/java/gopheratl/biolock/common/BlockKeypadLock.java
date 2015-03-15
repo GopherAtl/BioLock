@@ -1,5 +1,6 @@
 package gopheratl.biolock.common;
 
+import gopheratl.biolock.common.util.BLLog;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -11,7 +12,9 @@ import net.minecraft.world.World;
 
 public class BlockKeypadLock extends BlockProgrammable {
 
-	static IIcon tempIcon;
+	static IIcon textureTop;
+	static IIcon textureSide;
+	static IIcon textureBottom;
 	
 	public BlockKeypadLock()
 	{
@@ -23,15 +26,22 @@ public class BlockKeypadLock extends BlockProgrammable {
 	@SideOnly(Side.CLIENT)
 	public void registerBlockIcons(IIconRegister iconRegister)
 	{
-		tempIcon=iconRegister.registerIcon("BioLock:biolock_side");
-				
+		textureTop=iconRegister.registerIcon("biolock:biolock_top");
+		textureBottom=iconRegister.registerIcon("biolock:biolock_bottom");
+		textureSide=iconRegister.registerIcon("biolock:biolock_side");
 	}
 	
 	@Override
     @SideOnly(Side.CLIENT)
     public IIcon getIcon(IBlockAccess blockAccess, int x, int y, int z, int side)
     {
-        return tempIcon;
+		if (side == 0)
+            return textureBottom;
+
+        if (side == 1)
+    		return textureTop;
+        
+        return textureSide;
     }
 
     //called when rendering as block in inventory
@@ -39,7 +49,7 @@ public class BlockKeypadLock extends BlockProgrammable {
 	@SideOnly(Side.CLIENT)
 	public IIcon getIcon(int side, int par2)
     {
-        return tempIcon;
+		return side == 1 ? textureTop : textureSide;
     }
     
 	
@@ -75,7 +85,7 @@ public class BlockKeypadLock extends BlockProgrammable {
 	@Override
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ)
 	{
-		System.out.println("[BioLock] [DEBUG] Activate with hit at "+hitX+","+hitY+","+hitZ);
+		BLLog.debug("Activate with hit at %f, %f, %f", hitX, hitY, hitZ);
 		if (player.isSneaking())
 			return false;
 		
@@ -83,10 +93,10 @@ public class BlockKeypadLock extends BlockProgrammable {
 		int facing=world.getBlockMetadata(x, y, z);
 		if (facing!=side)
 		{
-			System.out.println("[BioLock] [DEBUG] wrong side.");
+			BLLog.debug("wrong side.");
 			return false;
 		}
-		System.out.println("[BioLock] [DEBUG] side="+side);
+		BLLog.debug("side = %d", side);
 		float relX=0f,relY=hitY*16f;
 		//normalize face-relative "x" pixel position
 		switch(facing)
@@ -100,7 +110,7 @@ public class BlockKeypadLock extends BlockProgrammable {
 		//figure out what, if any, button was hit?
 		if (relX<4f || relX>12 || relY<2.5f || relY>13.5f)
 		{
-			System.out.println("[BioLock] [DEBUG] outside button area.");			
+			BLLog.debug("outside button area.");			
 			//completely outside area of buttons, return
 			return false;
 		}
@@ -111,12 +121,12 @@ public class BlockKeypadLock extends BlockProgrammable {
 		//check and return if between buttons
 		if (colOff>2f || rowOff>2f)
 		{
-			System.out.println("[BioLock] [DEBUG] between buttons.");
+			BLLog.debug("between buttons.");
 			return false;
 		}		
 		
 		//ok! hit a button!
-		System.out.println("[BioLock] [DEBUG] Hit button on row "+row+" in col "+col);
+		BLLog.debug("Hit button on row %d in col %d", row, col);
 		TileEntityKeypadLock te=(TileEntityKeypadLock)world.getTileEntity(x,y,z);
 		te.pressedButton(player,(2-col)+3*(3-row));
 		return true;

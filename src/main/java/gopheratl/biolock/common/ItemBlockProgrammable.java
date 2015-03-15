@@ -28,6 +28,13 @@ public class ItemBlockProgrammable extends ItemBlock {
 	public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ, int metadata)
     {
 		boolean result=super.placeBlockAt(stack, player, world, x, y, z, side, hitX,hitY, hitZ, metadata);
+		BLLog.debug("placeBlockAt() (class:%s)", this.getClass().getSimpleName());
+		BLLog.debug("Equality check: %b", BioLock.proxy instanceof ProxyBioLockServer);
+		BLLog.debug("WorldObj null check: %b", (world == null));
+		if (world != null) {
+			BLLog.debug("WorldObj remote check: %b", (world.isRemote));
+		}
+		BLLog.debug("Relauncher check: %b", FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER);
 		if (result && FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER)
         {
         	TileEntity te=world.getTileEntity(x,y,z);

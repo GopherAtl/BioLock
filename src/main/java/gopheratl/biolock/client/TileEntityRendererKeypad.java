@@ -2,6 +2,7 @@ package gopheratl.biolock.client;
 
 import gopheratl.biolock.common.BioLock;
 import gopheratl.biolock.common.TileEntityKeypadLock;
+import gopheratl.biolock.common.TileEntityKeypadLock.ButtonState;
 
 import org.lwjgl.opengl.GL11;
 
@@ -9,13 +10,27 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import net.minecraftforge.client.IItemRenderer;
+import net.minecraftforge.client.IItemRenderer.ItemRenderType;
+import net.minecraftforge.client.IItemRenderer.ItemRendererHelper;
 
-public class TileEntityRendererKeypad extends TileEntitySpecialRenderer {
+public class TileEntityRendererKeypad extends TileEntitySpecialRenderer implements IItemRenderer {
 
 	static float texPixel=1.0f/16f;
+	
+	static ButtonState itemButtonStates[];
+	
+	static {
+		itemButtonStates=new ButtonState[12];
+		for(int i=0; i<12; ++i)
+		{
+			itemButtonStates[i]=new ButtonState();
+		}
+	}
 	
 	public static class ButtonRenderer {
 		public float x, y, z;
@@ -134,11 +149,21 @@ public class TileEntityRendererKeypad extends TileEntitySpecialRenderer {
 		GL11.glRotatef(te.getAngle(),0f,1f,0f);
 		GL11.glTranslatef(-.5f,0,-.5f);
 		
-
-		this.bindTexture(new ResourceLocation("BioLock:biolock_side"));
+		long time = world.getTotalWorldTime();
+		
+		this.bindTexture(new ResourceLocation("biolock", "textures/blocks/biolock_side.png"));
+		
+		drawKeypadBlock(te.buttonStates, time);
+		
+		GL11.glPopMatrix();
+	}
+	
+	public void drawKeypadBlock(ButtonState buttonStates[], long time) 
+	{
+		Tessellator tessellator=Tessellator.instance;
 		
 		tessellator.startDrawingQuads();
-		tessellator.setNormal(0f, 0f, 1f);
+		tessellator.setNormal(0f, 0f, -1f);
 		//inset face
 		tessellator.addVertexWithUV( texPixel,    texPixel,    texPixel, texPixel,    1f-texPixel);
 		tessellator.addVertexWithUV( texPixel,    1f-texPixel, texPixel, texPixel,    texPixel);
@@ -186,24 +211,119 @@ public class TileEntityRendererKeypad extends TileEntitySpecialRenderer {
 		tessellator.addVertexWithUV( texPixel,    1f-texPixel, texPixel, 1f,          1f-texPixel);
 		tessellator.addVertexWithUV( texPixel,    texPixel,    texPixel, 1f,          texPixel);
 		//left lip inside
-		tessellator.setNormal(-1f,1f,0f);
+		tessellator.setNormal(-1f,0f,0f);
 		tessellator.addVertexWithUV( 1f-texPixel, texPixel,    texPixel, 1f,          texPixel);
 		tessellator.addVertexWithUV( 1f-texPixel, 1f-texPixel, texPixel, 1f,          1f-texPixel);
 		tessellator.addVertexWithUV( 1f-texPixel, 1f-texPixel, 0f,       1f-texPixel, 1f-texPixel);
 		tessellator.addVertexWithUV( 1f-texPixel, texPixel,    0f,       1f-texPixel, texPixel);
-		
-		long time=world.getTotalWorldTime();
-		
+				
 		for (int i=0; i<12; ++i)
-			buttons[i].renderGeometry(tessellator,te.buttonStates[i].isPressed(time)?texPixel*.75f:0f);
+			buttons[i].renderGeometry(tessellator,buttonStates[i].isPressed(time)?texPixel*.75f:0f);
 		
 		tessellator.draw();		
 		
 		FontRenderer font=this.func_147498_b();
-		for (int i=0; i<12; ++i)
-			buttons[i].writeLabel(font,te.buttonStates[i].isPressed(time)?texPixel*.75f:0f);
+		if (font!=null)
+			for (int i=0; i<12; ++i)
+				buttons[i].writeLabel(font,buttonStates[i].isPressed(time)?texPixel*.75f:0f);
 				
 		
+	}
+
+	@Override
+	public boolean handleRenderType(ItemStack item, ItemRenderType type) {
+		return true;
+	}
+
+	@Override
+	public boolean shouldUseRenderHelper(ItemRenderType type, ItemStack item,
+			ItemRendererHelper helper) {
+		return true;
+	}
+
+	@Override
+	public void renderItem(ItemRenderType type, ItemStack item, Object... data) {
+		
+		
+		GL11.glPushMatrix();		
+
+		if (type==ItemRenderType.EQUIPPED_FIRST_PERSON)
+		{
+			GL11.glTranslatef(.5f,0,.5f);
+			GL11.glRotatef(90,0f,1f,0f);
+			GL11.glTranslatef(-.5f,0,-.5f);			
+		}
+		else if (type!=ItemRenderType.ENTITY)
+		{
+			GL11.glTranslatef(.5f,0,.5f);
+			GL11.glRotatef(180,0f,1f,0f);
+			GL11.glTranslatef(-.5f,0,-.5f);
+		}
+		else
+		{
+			//only entity left
+			GL11.glTranslatef(-.5f,-.5f,-.5f);
+		}
+		
+		//have to draw the sides ourselves here!
+		this.bindTexture(new ResourceLocation("biolock", "textures/blocks/biolock_top.png"));
+		
+		GL11.glBegin(GL11.GL_QUADS);
+		
+			GL11.glNormal3f(0f,1f,0f);
+			GL11.glTexCoord2f(0, 0);  GL11.glVertex3f(0f, 1f, 0f);
+			GL11.glTexCoord2f(0, 1);  GL11.glVertex3f(0f, 1f, 1f);
+			GL11.glTexCoord2f(1, 1);  GL11.glVertex3f(1f, 1f, 1f);
+			GL11.glTexCoord2f(1, 0);  GL11.glVertex3f(1f, 1f, 0f);
+		
+		GL11.glEnd();
+		
+		this.bindTexture(new ResourceLocation("biolock", "textures/blocks/biolock_side.png"));
+
+		GL11.glBegin(GL11.GL_QUADS);
+		
+		GL11.glNormal3f(-1f,0f,0f);		
+	 	GL11.glTexCoord2f(0, 0);  GL11.glVertex3f(0f, 1f, 0f);
+		GL11.glTexCoord2f(0, 1);  GL11.glVertex3f(0f, 0f, 0f);
+		GL11.glTexCoord2f(1, 1);  GL11.glVertex3f(0f, 0f, 1f);
+		GL11.glTexCoord2f(1, 0);  GL11.glVertex3f(0f, 1f, 1f);
+	
+		if (type!=ItemRenderType.INVENTORY)
+		{
+			//other 3 faces
+			GL11.glNormal3f(1f,0f,0f);
+			GL11.glTexCoord2f(0, 0);  GL11.glVertex3f(1f, 1f, 0f);
+			GL11.glTexCoord2f(1, 0);  GL11.glVertex3f(1f, 1f, 1f);
+			GL11.glTexCoord2f(1, 1);  GL11.glVertex3f(1f, 0f, 1f);
+			GL11.glTexCoord2f(0, 1);  GL11.glVertex3f(1f, 0f, 0f);
+					
+			GL11.glNormal3f(0f,0f,1f);
+			GL11.glTexCoord2f(0, 1);  GL11.glVertex3f(0f, 0f, 1f);
+			GL11.glTexCoord2f(1, 1);  GL11.glVertex3f(1f, 0f, 1f);
+			GL11.glTexCoord2f(1, 0);  GL11.glVertex3f(1f, 1f, 1f);
+			GL11.glTexCoord2f(0, 0);  GL11.glVertex3f(0f, 1f, 1f);
+					
+
+			GL11.glEnd();
+	
+			this.bindTexture(new ResourceLocation("biolock", "textures/blocks/biolock_bottom.png"));
+			
+			GL11.glBegin(GL11.GL_QUADS);
+
+			GL11.glNormal3f(0f,-1f,0f);
+			GL11.glTexCoord2f(0, 0);  GL11.glVertex3f(0f, 0f, 0f);
+			GL11.glTexCoord2f(1, 0);  GL11.glVertex3f(1f, 0f, 0f);
+			GL11.glTexCoord2f(1, 1);  GL11.glVertex3f(1f, 0f, 1f);
+			GL11.glTexCoord2f(0, 1);  GL11.glVertex3f(0f, 0f, 1f);
+			
+		}
+			
+		GL11.glEnd();
+			
+		this.bindTexture(new ResourceLocation("biolock", "textures/blocks/biolock_side.png"));
+
+		drawKeypadBlock( itemButtonStates, 10000);
+			
 		GL11.glPopMatrix();
 	}
 
