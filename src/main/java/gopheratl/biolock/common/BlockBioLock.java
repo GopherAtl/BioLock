@@ -60,13 +60,8 @@ public class BlockBioLock extends BlockProgrammable {
     		return textureTop;
         
         int facingSide = blockAccess.getBlockMetadata(x,y,z);
-        TileEntityBioLock tileEntity = (TileEntityBioLock)blockAccess.getTileEntity(x,y,z);
-        if (tileEntity == null) {
-        	BLLog.debug("Block tile entity is null!");
-        	return side == facingSide ? texturesFront[0] : textureSide;
-        }
-        BLLog.debug("Block frame index: %d", tileEntity.clientFrameIndex);
-        return side == facingSide ? texturesFront[ tileEntity.clientFrameIndex ]: textureSide;
+        return side == facingSide ? texturesFront[0] : textureSide;
+
     }
    
     

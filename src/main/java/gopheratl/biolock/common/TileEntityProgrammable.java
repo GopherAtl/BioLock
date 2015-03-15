@@ -2,7 +2,7 @@ package gopheratl.biolock.common;
 
 import gopheratl.GopherCore.GopherCore;
 import gopheratl.GopherCore.InstanceDataManager;
-import gopheratl.biolock.common.TileEntityBioLock.RedstoneProgram;
+import gopheratl.biolock.common.RedstoneProgram;
 import gopheratl.biolock.common.TileEntityBioLock.StoredPrint;
 import gopheratl.biolock.common.util.BLLog;
 import gopheratl.biolock.server.ProxyBioLockServer;
@@ -503,10 +503,9 @@ public abstract class TileEntityProgrammable extends TileEntity implements IPeri
 	@Override
 	public void attach(IComputerAccess computer)
 	{
-		attachedPuters.put(computer.getID(),computer);			
-		String basePath=MinecraftServer.getServer().getFolderName()+"/BioLocks/lua/";
-		if (!MinecraftServer.getServer().isDedicatedServer())
-			basePath="saves/"+basePath;
+		BLLog.debug("Attaching new computer id %d at %d, %d, %d", computer.getID(), xCoord, yCoord, zCoord);
+		attachedPuters.put(computer.getID(),computer);
+		BLLog.debug("Peripheral now has %d computers attached", attachedPuters.size());
 		
 		int count=0;
 		Pair key=new Pair(computer.getID(),this.getClass().getName());
@@ -533,10 +532,10 @@ public abstract class TileEntityProgrammable extends TileEntity implements IPeri
 		if (computerPeripheralCounts.containsKey(key))
 			count=computerPeripheralCounts.get(key);
 		else
-			System.out.println("[BioLock] [THREATLEVELGAMMA] - detached a peripheral that never attached?! O_o");
+			BLLog.severe("[THREATLEVELGAMMA] - detached a peripheral that never attached?! O_o");
 		
 		if (count<=0)
-			System.out.println("[BioLock] [THREATLEVELGAMMA] - detached more peripherals than we attached?! o_O");
+			BLLog.severe("[THREATLEVELGAMMA] - detached more peripherals than we attached?! o_O");
 		computerPeripheralCounts.put(key, count-1);
 	}
 
@@ -575,12 +574,12 @@ public abstract class TileEntityProgrammable extends TileEntity implements IPeri
 				
 			else 
 			{
-				System.out.println("[BioLock] unlocked, calling");
+				BLLog.info("unlocked, calling");
 				return method.executor.run(this,computer,arguments);							
 			}
 				
 		} catch(Exception ex) {			
-			System.out.println("[BioLock] exception in callMethod");
+			BLLog.severe("exception in callMethod");
 			ex.printStackTrace();
 			return new Object[] { false, " O_o How'd you do that?" };
 		}
@@ -588,6 +587,16 @@ public abstract class TileEntityProgrammable extends TileEntity implements IPeri
 	
 	@Override
 	public boolean equals(IPeripheral other) {
+		if(other == null) {
+			return false;
+		}
+		if(this == other) {
+			return true;
+		}
+		if(other instanceof TileEntity) {
+			TileEntity tother = (TileEntity) other;
+			return tother.getWorldObj().equals(worldObj) && tother.xCoord == this.xCoord && tother.yCoord == this.yCoord && tother.zCoord == this.zCoord;
+		}
 		return false;
 	}
 	

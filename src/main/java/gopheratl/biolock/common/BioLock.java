@@ -25,6 +25,11 @@ import java.util.Set;
 
 
 
+
+
+
+
+
 import org.apache.logging.log4j.Level;
 
 import net.minecraft.block.Block;
@@ -33,6 +38,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import cpw.mods.fml.common.Mod;
@@ -46,6 +53,9 @@ import cpw.mods.fml.common.event.FMLServerStartedEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.Side;
+import dan200.computercraft.api.ComputerCraftAPI;
+import dan200.computercraft.api.peripheral.IPeripheral;
+import dan200.computercraft.api.peripheral.IPeripheralProvider;
 
 @Mod(modid="BioLock", name="BioLock", version="2.0b")
 public class BioLock
@@ -78,6 +88,17 @@ public class BioLock
 	public static String EXTRACTED_LUA_PATH;
 	
 	public static LuaMount mount = new LuaMount();
+	
+	public class PeripheralProvider implements IPeripheralProvider {
+		@Override
+		public IPeripheral getPeripheral(World world, int x, int y, int z, int side) {
+			TileEntity entity = world.getTileEntity(x, y, z);
+			if (entity instanceof TileEntityProgrammable) {
+				return (IPeripheral)entity;
+			}
+			return null;
+	   }
+	}
 	
 	//public int[] foo={1,2,3};
 	
@@ -141,6 +162,8 @@ public class BioLock
 	{
 		long time = System.nanoTime();
 		BLLog.debug("Starting init");
+		
+		ComputerCraftAPI.registerPeripheralProvider(new PeripheralProvider());
 		
 		PacketHandler.init();
 		
