@@ -25,7 +25,6 @@ public class ProxyBioLock {
     public void init() {
     	registerRecipes();
     	registerRenderInformation();
-    	setupLuaFiles();
     }
 	
 	protected void registerRenderInformation() {
@@ -79,31 +78,6 @@ public class ProxyBioLock {
 		}
 	}
 	
-	public boolean setupLuaFiles() {
-		BLLog.debug("Extracting Lua files");
-		ModContainer container = FMLCommonHandler.instance().findContainerFor(BioLock.instance);
-		File modFile = container.getSource();
-		File baseFile = getBase();
-		if (modFile.isDirectory()) {
-			File srcFile = new File(modFile, BioLock.LUA_PATH);
-			File destFile = new File(baseFile, BioLock.EXTRACTED_LUA_PATH);
-			if (destFile.exists()) {
-				return false;
-			}
-			try {
-				ResourceExtractingUtils.copy(srcFile, destFile);
-			} catch (IOException e) {
-			}
-		} else {
-			File destFile = new File(BioLock.proxy.getBase(), BioLock.EXTRACTED_LUA_PATH);
-			if (destFile.exists()) {
-				return false;
-			}
-			ResourceExtractingUtils.extractZipToLocation(modFile, BioLock.LUA_PATH, BioLock.EXTRACTED_LUA_PATH);
-		}
-		return true;
-	}
-
 	public World getWorld(int dimId) {
 		//overridden separately for client and server.
 		return null;

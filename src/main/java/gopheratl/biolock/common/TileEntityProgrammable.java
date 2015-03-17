@@ -26,6 +26,7 @@ import org.apache.logging.log4j.Level;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
+import dan200.computercraft.api.ComputerCraftAPI;
 import dan200.computercraft.api.lua.ILuaContext;
 import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.peripheral.IComputerAccess;
@@ -517,7 +518,7 @@ public abstract class TileEntityProgrammable extends TileEntity implements IPeri
 		
 		if (count==0)
 		{
-			computer.mount("biolock", BioLock.mount);
+			computer.mount("rom/programs/biolock", ComputerCraftAPI.createResourceMount(BioLock.class,"biolock", "lua"));
 		}
 	}
 

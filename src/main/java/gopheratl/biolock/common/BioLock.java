@@ -5,7 +5,6 @@ import gopheratl.GopherCore.GopherCore;
 import gopheratl.GopherCore.InstanceDataManager;
 import gopheratl.biolock.client.BiolockRenderer;
 import gopheratl.biolock.common.network.PacketHandler;
-import gopheratl.biolock.common.peripheral.LuaMount;
 import gopheratl.biolock.common.util.BLLog;
 
 import java.lang.reflect.InvocationTargetException;
@@ -83,12 +82,7 @@ public class BioLock
 	
 	@Instance(value = "BioLock")
 	public static BioLock instance;
-	
-	public static String LUA_PATH;
-	public static String EXTRACTED_LUA_PATH;
-	
-	public static LuaMount mount = new LuaMount();
-	
+			
 	public class PeripheralProvider implements IPeripheralProvider {
 		@Override
 		public IPeripheral getPeripheral(World world, int x, int y, int z, int side) {
@@ -140,10 +134,7 @@ public class BioLock
 		BLLog.init();
 		GCLog.init();
 		BLLog.debug("Starting pre-init");
-		
-		LUA_PATH = "/assets/biolock/lua";
-		EXTRACTED_LUA_PATH = String.format("mods/BioLocks/%s/lua", FMLCommonHandler.instance().findContainerFor(BioLock.instance).getVersion());
-		
+				
 		Configuration configFile = new Configuration(evt.getSuggestedConfigurationFile());
 		
 		Property prop = configFile.get( "general", "bioLock_InternalMemorySize", 16);
