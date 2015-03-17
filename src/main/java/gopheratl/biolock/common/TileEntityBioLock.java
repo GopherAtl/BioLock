@@ -230,6 +230,7 @@ public class TileEntityBioLock extends TileEntityProgrammable {
 	
 	public void writeInstanceToNBT(NBTTagCompound nbt)
 	{		
+		System.out.println("[BioLock] writeInstanceToNBT");
 		NBTTagList names=new NBTTagList();
 		NBTTagList prints=new NBTTagList();
 		if (storedPrints==null)

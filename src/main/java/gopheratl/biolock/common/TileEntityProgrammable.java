@@ -396,11 +396,14 @@ public abstract class TileEntityProgrammable extends TileEntity implements IPeri
 
 	public void saveInstanceData()
 	{		
-		if(BioLock.proxy instanceof ProxyBioLockServer) //TODO: shouldSaveData? 
+		System.out.println("[BioLock] saveInstanceData");
+		if(FMLCommonHandler.instance().getEffectiveSide()==Side.SERVER)//BioLock.proxy instanceof ProxyBioLockServer) //TODO: shouldSaveData? 
 		{
+			System.out.println("[BioLock] is on server");
 			File outFile=new File(BioLock.getInstanceManager(this.getClass()).getFilePath(instanceID));
 			if (!outFile.exists() || outFile.canWrite())
 			{
+				System.out.println("[BioLock] can write");
 			    NBTTagCompound nbt=new NBTTagCompound();
 				
 			    //write the common programmable peripheral info
