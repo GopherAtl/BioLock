@@ -112,7 +112,7 @@ public class BlockKeypadLock extends BlockProgrammable {
 		{
 			BLLog.debug("outside button area.");			
 			//completely outside area of buttons, return
-			return false;
+			return true;
 		}
 		int col=(int)((relX-4f)/3f);
 		float colOff=(relX-4f)%3f;
@@ -122,7 +122,7 @@ public class BlockKeypadLock extends BlockProgrammable {
 		if (colOff>2f || rowOff>2f)
 		{
 			BLLog.debug("between buttons.");
-			return false;
+			return true;
 		}		
 		
 		//ok! hit a button!

@@ -182,7 +182,7 @@ public class TileEntityKeypadLock extends TileEntityProgrammable {
 		//now read the programs
 		NBTTagList programs=nbt.getTagList("redstonePrograms", 10);
 		if (programs!=null && programs.tagCount()==6)
-			for (int i=6; i>0; i--)
+			for (int i=5; i>=0; i--)
 			{
 				NBTTagCompound prog=(NBTTagCompound)programs.removeTag(i);
 				if (prog.hasNoTags())
