@@ -166,11 +166,11 @@ public class TileEntityKeypadLock extends TileEntityProgrammable {
 		   return;
 		}
 		try {
-			for (int i=accessLevels.length; i>0; i--)
+			for (int i=0; i<accessLevels.length; i++)
 			{
-				NBTTagString code=(NBTTagString)codes.removeTag(i);
-				NBTTagString name=(NBTTagString)names.removeTag(i);
-				storedCodes.put(name.func_150285_a_(),new LockCode(name.func_150285_a_(),code.func_150285_a_(),accessLevels[i]));
+				String code=codes.getStringTagAt(i);
+				String name=names.getStringTagAt(i);
+				storedCodes.put(name,new LockCode(name,code,accessLevels[i]));
 			}
 		}
 		catch (Exception e)
@@ -182,9 +182,9 @@ public class TileEntityKeypadLock extends TileEntityProgrammable {
 		//now read the programs
 		NBTTagList programs=nbt.getTagList("redstonePrograms", 10);
 		if (programs!=null && programs.tagCount()==6)
-			for (int i=5; i>=0; i--)
+			for (int i=0; i<6; i++)
 			{
-				NBTTagCompound prog=(NBTTagCompound)programs.removeTag(i);
+				NBTTagCompound prog=programs.getCompoundTagAt(i);
 				if (prog.hasNoTags())
 					redstonePrograms[i]=null;
 				else
