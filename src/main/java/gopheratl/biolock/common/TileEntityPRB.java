@@ -14,6 +14,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagDouble;
 import net.minecraft.nbt.NBTTagInt;
+import net.minecraft.nbt.NBTTagIntArray;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraft.nbt.NBTTagCompound;
@@ -588,7 +589,8 @@ public class TileEntityPRB extends TileEntityProgrammable {
 			{
 				if (programs[side].update())
 				{
-					outputChanged=true;				
+					outputChanged=true;			
+					outputs[side]=programs[side].output;
 				}
 			}
 			updateNeeded=false;
@@ -596,6 +598,7 @@ public class TileEntityPRB extends TileEntityProgrammable {
 		
 		if (outputChanged)
 		{
+			
 			//build and send packet to client
 			worldObj.markBlockForUpdate(xCoord,yCoord,zCoord);
 			worldObj.notifyBlocksOfNeighborChange(xCoord, yCoord, zCoord, BioLock.Blocks.prb);
@@ -611,10 +614,7 @@ public class TileEntityPRB extends TileEntityProgrammable {
 		{
 			System.out.println("[BioLock] Server sending PRB description to client...");
 			NBTTagCompound nbt=new NBTTagCompound();
-			NBTTagList list=new NBTTagList();
-			for (int i=0; i<6; ++i)
-				list.appendTag(new NBTTagInt(programs[i].output));
-			nbt.setTag("outputs", list);
+			nbt.setIntArray("outputs", outputs);
 			return new S35PacketUpdateTileEntity(this.xCoord,this.yCoord,this.zCoord,1,nbt);
 		}
 		return null;
@@ -627,14 +627,11 @@ public class TileEntityPRB extends TileEntityProgrammable {
 		{
 			System.out.println("[BioLock] ("+this+") Client parsing PRB description from server...");
 			NBTTagCompound nbt=pkt.func_148857_g();
-			NBTTagList list=nbt.getTagList("outputs", 3);
-			int i = 0;
-			while (list.tagCount() > 0)
-			{
-				int newVal=((NBTTagInt)list.removeTag(1)).func_150287_d();
-				System.out.println("[BioLock] outputs["+i+"] was "+outputs[i]+", now "+newVal);
-				outputs[i]=newVal;
-				i++;
+			int[] list=nbt.getIntArray("outputs");
+			for (int i=0; i<6; ++i)
+			{				
+				System.out.println("[BioLock] outputs["+i+"] was "+outputs[i]+", now "+list[i]);
+				outputs[i]=list[i];
 			}
 			worldObj.markBlockForUpdate(xCoord,yCoord,zCoord);			
 		}		
