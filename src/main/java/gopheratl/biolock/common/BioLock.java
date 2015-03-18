@@ -29,7 +29,10 @@ import java.util.Set;
 
 
 
+
 import org.apache.logging.log4j.Level;
+
+import com.example.examplemod.ExampleMod;
 
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
@@ -56,9 +59,12 @@ import dan200.computercraft.api.ComputerCraftAPI;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.api.peripheral.IPeripheralProvider;
 
-@Mod(modid="BioLock", name="BioLock", version="2.0b")
+@Mod(modid = BioLock.MODID, version = BioLock.VERSION)
 public class BioLock
 {
+	public static final String MODID="biolock";
+	public static final String VERSION="2.2";
+	
 	public static class Blocks {
 		public static BlockBioLock bioLock;
 		public static BlockPRB prb;
