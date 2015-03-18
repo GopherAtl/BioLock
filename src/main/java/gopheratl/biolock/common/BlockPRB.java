@@ -70,12 +70,13 @@ public class BlockPRB extends BlockProgrammable {
 		updateSideInputs(world,x,y,z);
 	}
 	
+    @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getBlockTexture(IBlockAccess blockAccess, int x, int y, int z, int side)
+    public IIcon getIcon(IBlockAccess blockAccess, int x, int y, int z, int side)
     {
     	int facingSide = blockAccess.getBlockMetadata(x,y,z);
         TileEntityPRB tileEntity = (TileEntityPRB)blockAccess.getTileEntity(x,y,z);               
-        //System.out.println("[BioLock] [DEBUG] getBlockTexture - side "+side+", isPowering=="+tileEntity.isPowering(side));
+        //System.out.println("[BioLock] [DEBUG] getBlockTexture - side "+side+", isPowering=="+tileEntity.isPowering(side)+", facing=="+facingSide);
         boolean isOn=tileEntity!=null ? tileEntity.isPowering(side) : false;
         return side == facingSide ? (isOn ? textureFrontOn : textureFrontOff) : (isOn ? textureSideOn : textureSideOff);
     }

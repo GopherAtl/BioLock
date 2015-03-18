@@ -175,6 +175,7 @@ public abstract class BlockProgrammable extends BlockContainer {
     {
         int facing = MathHelper.floor_double((double)(entity.rotationYaw / 90.0f) + 0.5D) & 3;
         float angle=facing*-90f;
+        //System.out.println("[BioLock] onBlockPlacedBy, facing="+facing+", to metadata = "+facingToSideMap[facing]);
         world.setBlockMetadataWithNotify(x,y,z,facingToSideMap[facing],7);
     }
     
