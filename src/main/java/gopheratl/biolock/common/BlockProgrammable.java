@@ -105,26 +105,31 @@ public abstract class BlockProgrammable extends BlockContainer {
     }
 
     
-    public boolean isBlockNormalCube(World world, int x, int y, int z)
+    @Override
+    public boolean isNormalCube(IBlockAccess world, int x, int y, int z)
     {
     	return false;
     }
     
-    public boolean isBlockSolidOnSide(World world, int i, int j, int k, ForgeDirection side)
+    @Override
+    public boolean isSideSolid(IBlockAccess world, int i, int j, int k, ForgeDirection side)
     {
       return true;
     }
 
+    @Override
     public boolean canProvidePower()
     {
         return true;
     }
     
+    @Override
     public int isProvidingStrongPower(IBlockAccess blockAccess, int x, int y, int z, int side)
     {
     	return isProvidingWeakPower(blockAccess,x,y,z,side);
     }
     
+    @Override
     public int isProvidingWeakPower(IBlockAccess blockAccess, int x, int y, int z, int side)
     {
     	boolean res;
@@ -132,7 +137,8 @@ public abstract class BlockProgrammable extends BlockContainer {
 		//System.out.println("[BioLock] [DEBUG] isProvidingWeakPower "+tep.getSideOutput(side));
     	return tep.getSideOutput(side^1);
     }
-     
+    
+    @Override
     public void onBlockAdded(World world, int x, int y, int z)
     {
         super.onBlockAdded(world,x,y,z);
