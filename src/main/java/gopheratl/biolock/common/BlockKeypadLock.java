@@ -76,10 +76,11 @@ public class BlockKeypadLock extends BlockProgrammable {
 		/**/
 	}
 	
+	
 	@Override
 	public boolean isOpaqueCube()
 	{
-		return true;
+		return false;
 	}
 	
 	@Override

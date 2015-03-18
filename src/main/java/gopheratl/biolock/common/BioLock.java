@@ -62,8 +62,8 @@ import dan200.computercraft.api.peripheral.IPeripheralProvider;
 @Mod(modid = BioLock.MODID, version = BioLock.VERSION)
 public class BioLock
 {
-	public static final String MODID="biolock";
-	public static final String VERSION="2.2";
+	public static final String MODID="BioLock";
+	public static final String VERSION="2.2.pr1";
 	
 	public static class Blocks {
 		public static BlockBioLock bioLock;
